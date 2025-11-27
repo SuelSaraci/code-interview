@@ -1,4 +1,4 @@
-import { axiosInstance } from "./apiClient";
+import { axiosInstance, getAuthHeaders } from "./apiClient";
 import type {
   GetQuestionByIdResponse,
   GetQuestionsQuery,
@@ -6,14 +6,20 @@ import type {
 } from "./types";
 
 export async function getQuestions(query?: GetQuestionsQuery) {
+  const headers = await getAuthHeaders();
   const res = await axiosInstance.get<GetQuestionsResponse>("/api/questions", {
     params: query,
+    headers,
   });
   return res.data;
 }
 
 export async function getQuestionById(id: number) {
-  const res = await axiosInstance.get<GetQuestionByIdResponse>(`/api/questions/${id}`);
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.get<GetQuestionByIdResponse>(
+    `/api/questions/${id}`,
+    { headers }
+  );
   return res.data;
 }
 

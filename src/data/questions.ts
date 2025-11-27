@@ -1,23 +1,24 @@
-import { Question } from '../types';
+import { Question } from "../types";
 
 export const questions: Question[] = [
   // FREE QUESTIONS - HTML
   {
-    id: 'q1',
-    title: 'What is semantic HTML and why is it important?',
-    level: 'junior',
-    language: 'HTML',
-    topic: 'Frontend',
+    id: "q1",
+    title: "What is semantic HTML and why is it important?",
+    level: "junior",
+    language: "HTML",
+    topic: "Frontend",
     timeMinutes: 10,
     isFree: true,
-    difficulty: 'Easy',
-    company: 'Google',
-    description: 'What is the main benefit of using semantic HTML elements like <article>, <nav>, and <header> instead of generic <div> elements?',
+    difficulty: "Easy",
+    company: "Google",
+    description:
+      "What is the main benefit of using semantic HTML elements like <article>, <nav>, and <header> instead of generic <div> elements?",
     options: [
-      'Semantic elements make the page load faster',
-      'Semantic elements improve accessibility and SEO by providing meaning to content structure',
-      'Semantic elements automatically add CSS styling to the page',
-      'Semantic elements are required for JavaScript to work properly'
+      "Semantic elements make the page load faster",
+      "Semantic elements improve accessibility and SEO by providing meaning to content structure",
+      "Semantic elements automatically add CSS styling to the page",
+      "Semantic elements are required for JavaScript to work properly",
     ],
     correctAnswerIndex: 1,
     sampleAnswer: `Semantic HTML uses HTML elements that clearly describe their meaning and purpose to both the browser and the developer. Examples include:
@@ -31,32 +32,34 @@ Benefits:
 2. Better SEO
 3. Easier to maintain and understand code
 4. Better structure and meaning`,
-    explanation: 'Semantic HTML is crucial for accessibility and SEO. It helps search engines and assistive technologies understand the structure and meaning of your content. Screen readers can navigate better, and search engines can better understand what your content is about.',
+    explanation:
+      "Semantic HTML is crucial for accessibility and SEO. It helps search engines and assistive technologies understand the structure and meaning of your content. Screen readers can navigate better, and search engines can better understand what your content is about.",
     commonMistakes: [
-      'Using <div> for everything instead of semantic elements',
-      'Not considering accessibility implications',
-      'Confusing semantic HTML with styling'
+      "Using <div> for everything instead of semantic elements",
+      "Not considering accessibility implications",
+      "Confusing semantic HTML with styling",
     ],
-    techHint: 'Think about the meaning of content, not just appearance'
+    techHint: "Think about the meaning of content, not just appearance",
   },
-  
+
   // FREE QUESTIONS - CSS
   {
-    id: 'q2',
-    title: 'Explain the CSS Box Model',
-    level: 'mid',
-    language: 'CSS',
-    topic: 'Frontend',
+    id: "q2",
+    title: "Explain the CSS Box Model",
+    level: "mid",
+    language: "CSS",
+    topic: "Frontend",
     timeMinutes: 15,
     isFree: true,
-    difficulty: 'Medium',
-    company: 'Meta',
-    description: 'In the CSS box model, what does setting "box-sizing: border-box" do?',
+    difficulty: "Medium",
+    company: "Meta",
+    description:
+      'In the CSS box model, what does setting "box-sizing: border-box" do?',
     options: [
-      'Makes the width/height include padding and border, making sizing calculations easier',
-      'Removes all padding and borders from the element',
-      'Only applies width/height to the content area, excluding padding and border',
-      'Automatically centers the element within its container'
+      "Makes the width/height include padding and border, making sizing calculations easier",
+      "Removes all padding and borders from the element",
+      "Only applies width/height to the content area, excluding padding and border",
+      "Automatically centers the element within its container",
     ],
     correctAnswerIndex: 0,
     sampleAnswer: `The CSS box model consists of:
@@ -73,32 +76,34 @@ box-sizing property:
 - border-box: width/height include padding and border
 
 Best practice: Use border-box for easier sizing calculations.`,
-    explanation: 'Understanding the box model is fundamental to CSS layout. The box-sizing: border-box property makes width/height calculations include padding and border, so if you set width: 300px with 20px padding, the total width stays 300px instead of becoming 340px.',
+    explanation:
+      "Understanding the box model is fundamental to CSS layout. The box-sizing: border-box property makes width/height calculations include padding and border, so if you set width: 300px with 20px padding, the total width stays 300px instead of becoming 340px.",
     commonMistakes: [
-      'Forgetting about padding and border in width calculations',
-      'Not using box-sizing: border-box',
-      'Confusing margin collapse behavior'
+      "Forgetting about padding and border in width calculations",
+      "Not using box-sizing: border-box",
+      "Confusing margin collapse behavior",
     ],
-    techHint: 'Use * { box-sizing: border-box; } as a reset'
+    techHint: "Use * { box-sizing: border-box; } as a reset",
   },
 
   // FREE QUESTIONS - JavaScript
   {
-    id: 'q3',
-    title: 'What is closure in JavaScript?',
-    level: 'senior',
-    language: 'JavaScript',
-    topic: 'Frontend',
+    id: "q3",
+    title: "What is closure in JavaScript?",
+    level: "senior",
+    language: "JavaScript",
+    topic: "Frontend",
     timeMinutes: 20,
     isFree: true,
-    difficulty: 'Hard',
-    company: 'Amazon',
-    description: 'What is a closure in JavaScript and what is its primary benefit?',
+    difficulty: "Hard",
+    company: "Amazon",
+    description:
+      "What is a closure in JavaScript and what is its primary benefit?",
     options: [
-      'A closure is a function that has access to variables in its outer scope, even after the outer function has returned. It enables data privacy and function factories.',
-      'A closure is a way to close and terminate all running functions in JavaScript',
-      'A closure is a CSS property used to close gaps between elements',
-      'A closure is a method to close database connections after queries'
+      "A closure is a function that has access to variables in its outer scope, even after the outer function has returned. It enables data privacy and function factories.",
+      "A closure is a way to close and terminate all running functions in JavaScript",
+      "A closure is a CSS property used to close gaps between elements",
+      "A closure is a method to close database connections after queries",
     ],
     correctAnswerIndex: 0,
     sampleAnswer: `A closure is a function that has access to variables in its outer (enclosing) lexical scope, even after the outer function has returned.
@@ -124,32 +129,34 @@ Use cases:
 - Event handlers
 - Callbacks
 - Module pattern`,
-    explanation: 'Closures are fundamental to JavaScript and enable powerful patterns like data privacy, partial application, and currying.',
+    explanation:
+      "Closures are fundamental to JavaScript and enable powerful patterns like data privacy, partial application, and currying.",
     commonMistakes: [
-      'Memory leaks from unintended closures',
-      'Not understanding the scope chain',
-      'Closure in loops without let/const'
+      "Memory leaks from unintended closures",
+      "Not understanding the scope chain",
+      "Closure in loops without let/const",
     ],
-    techHint: 'Think of closures as "functions with memory"'
+    techHint: 'Think of closures as "functions with memory"',
   },
 
   // PREMIUM HTML QUESTIONS
   {
-    id: 'q4',
-    title: 'Explain the difference between <div> and <span>',
-    level: 'junior',
-    language: 'HTML',
-    topic: 'Frontend',
+    id: "q4",
+    title: "Explain the difference between <div> and <span>",
+    level: "junior",
+    language: "HTML",
+    topic: "Frontend",
     timeMinutes: 8,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Shopify',
-    description: 'What is the main difference between <div> and <span> elements?',
+    difficulty: "Easy",
+    company: "Shopify",
+    description:
+      "What is the main difference between <div> and <span> elements?",
     options: [
-      '<div> is a block-level element that starts on a new line and takes full width; <span> is inline and only takes necessary width',
-      '<div> is for text only; <span> is for images only',
-      '<div> is faster to render than <span>',
-      '<div> and <span> are exactly the same, just different names'
+      "<div> is a block-level element that starts on a new line and takes full width; <span> is inline and only takes necessary width",
+      "<div> is for text only; <span> is for images only",
+      "<div> is faster to render than <span>",
+      "<div> and <span> are exactly the same, just different names",
     ],
     correctAnswerIndex: 0,
     sampleAnswer: `<div> (Division):
@@ -170,26 +177,28 @@ Example:
 <div class="container">
   <p>This is a <span class="highlight">highlighted</span> word.</p>
 </div>`,
-    explanation: 'Understanding block vs inline elements is fundamental to HTML structure and CSS layout.',
+    explanation:
+      "Understanding block vs inline elements is fundamental to HTML structure and CSS layout.",
     commonMistakes: [
-      'Using span for layout containers',
-      'Nesting block elements inside span',
-      'Not understanding when to use each'
+      "Using span for layout containers",
+      "Nesting block elements inside span",
+      "Not understanding when to use each",
     ],
-    techHint: 'Block elements stack vertically, inline elements flow horizontally'
+    techHint:
+      "Block elements stack vertically, inline elements flow horizontally",
   },
 
   {
-    id: 'q5',
-    title: 'What are HTML data attributes and when should you use them?',
-    level: 'mid',
-    language: 'HTML',
-    topic: 'Frontend',
+    id: "q5",
+    title: "What are HTML data attributes and when should you use them?",
+    level: "mid",
+    language: "HTML",
+    topic: "Frontend",
     timeMinutes: 12,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'Stripe',
-    description: 'Explain data-* attributes and their use cases.',
+    difficulty: "Medium",
+    company: "Stripe",
+    description: "Explain data-* attributes and their use cases.",
     sampleAnswer: `Data attributes are custom attributes that start with "data-" and allow you to store extra information on HTML elements.
 
 Syntax:
@@ -211,27 +220,28 @@ Best practices:
 - Use for non-visible data only
 - Keep attribute names lowercase with hyphens
 - Don't use for sensitive data (it's visible in HTML)`,
-    explanation: 'Data attributes provide a standard way to store custom data on elements without polluting the global namespace or using non-standard attributes.',
+    explanation:
+      "Data attributes provide a standard way to store custom data on elements without polluting the global namespace or using non-standard attributes.",
     commonMistakes: [
-      'Storing sensitive information',
-      'Using them instead of proper form inputs',
-      'Not camelCasing when accessing via dataset'
+      "Storing sensitive information",
+      "Using them instead of proper form inputs",
+      "Not camelCasing when accessing via dataset",
     ],
-    techHint: 'data-user-name becomes dataset.userName in JavaScript'
+    techHint: "data-user-name becomes dataset.userName in JavaScript",
   },
 
   // PREMIUM CSS QUESTIONS
   {
-    id: 'q6',
-    title: 'Explain CSS Flexbox and its main properties',
-    level: 'junior',
-    language: 'CSS',
-    topic: 'Frontend',
+    id: "q6",
+    title: "Explain CSS Flexbox and its main properties",
+    level: "junior",
+    language: "CSS",
+    topic: "Frontend",
     timeMinutes: 15,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Airbnb',
-    description: 'What is Flexbox and what are the most important properties?',
+    difficulty: "Easy",
+    company: "Airbnb",
+    description: "What is Flexbox and what are the most important properties?",
     sampleAnswer: `Flexbox is a one-dimensional layout method for arranging items in rows or columns.
 
 Container properties:
@@ -253,26 +263,27 @@ Example:
   justify-content: space-between;
   align-items: center;
 }`,
-    explanation: 'Flexbox solves many layout problems that were difficult with floats and positioning. It\'s perfect for one-dimensional layouts.',
+    explanation:
+      "Flexbox solves many layout problems that were difficult with floats and positioning. It's perfect for one-dimensional layouts.",
     commonMistakes: [
-      'Forgetting display: flex on container',
-      'Confusing justify-content with align-items',
-      'Not understanding flex-shrink behavior'
+      "Forgetting display: flex on container",
+      "Confusing justify-content with align-items",
+      "Not understanding flex-shrink behavior",
     ],
-    techHint: 'justify-content = main axis, align-items = cross axis'
+    techHint: "justify-content = main axis, align-items = cross axis",
   },
 
   {
-    id: 'q7',
-    title: 'What is CSS Grid and how does it differ from Flexbox?',
-    level: 'mid',
-    language: 'CSS',
-    topic: 'Frontend',
+    id: "q7",
+    title: "What is CSS Grid and how does it differ from Flexbox?",
+    level: "mid",
+    language: "CSS",
+    topic: "Frontend",
     timeMinutes: 18,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'Netflix',
-    description: 'Explain CSS Grid and when to use it over Flexbox.',
+    difficulty: "Medium",
+    company: "Netflix",
+    description: "Explain CSS Grid and when to use it over Flexbox.",
     sampleAnswer: `CSS Grid is a two-dimensional layout system for creating complex layouts.
 
 Key properties:
@@ -303,26 +314,27 @@ When to use Flexbox:
 - Card layouts
 - Centering
 - Simple one-direction layouts`,
-    explanation: 'Grid and Flexbox complement each other. Grid for overall page layout, Flexbox for component layouts.',
+    explanation:
+      "Grid and Flexbox complement each other. Grid for overall page layout, Flexbox for component layouts.",
     commonMistakes: [
-      'Using Grid when Flexbox would be simpler',
-      'Not understanding fr units',
-      'Overcomplicating simple layouts'
+      "Using Grid when Flexbox would be simpler",
+      "Not understanding fr units",
+      "Overcomplicating simple layouts",
     ],
-    techHint: 'Grid = 2D layout, Flexbox = 1D layout'
+    techHint: "Grid = 2D layout, Flexbox = 1D layout",
   },
 
   {
-    id: 'q8',
-    title: 'Explain CSS specificity and the cascade',
-    level: 'senior',
-    language: 'CSS',
-    topic: 'Frontend',
+    id: "q8",
+    title: "Explain CSS specificity and the cascade",
+    level: "senior",
+    language: "CSS",
+    topic: "Frontend",
     timeMinutes: 20,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Google',
-    description: 'How does CSS specificity work and what is the cascade?',
+    difficulty: "Hard",
+    company: "Google",
+    description: "How does CSS specificity work and what is the cascade?",
     sampleAnswer: `Specificity determines which CSS rule applies when multiple rules target the same element.
 
 Specificity hierarchy (least to most specific):
@@ -347,27 +359,29 @@ Best practices:
 - Keep specificity low
 - Use classes over IDs
 - BEM methodology helps`,
-    explanation: 'Understanding specificity prevents CSS conflicts and helps write maintainable stylesheets.',
+    explanation:
+      "Understanding specificity prevents CSS conflicts and helps write maintainable stylesheets.",
     commonMistakes: [
-      'Overusing !important',
-      'Using overly specific selectors',
-      'Not understanding specificity calculation'
+      "Overusing !important",
+      "Using overly specific selectors",
+      "Not understanding specificity calculation",
     ],
-    techHint: 'Keep specificity as low as possible for easier maintenance'
+    techHint: "Keep specificity as low as possible for easier maintenance",
   },
 
   // PREMIUM JAVASCRIPT QUESTIONS
   {
-    id: 'q9',
-    title: 'What is the difference between var, let, and const?',
-    level: 'junior',
-    language: 'JavaScript',
-    topic: 'Frontend',
+    id: "q9",
+    title: "What is the difference between var, let, and const?",
+    level: "junior",
+    language: "JavaScript",
+    topic: "Frontend",
     timeMinutes: 12,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Microsoft',
-    description: 'Explain the differences between var, let, and const in JavaScript.',
+    difficulty: "Easy",
+    company: "Microsoft",
+    description:
+      "Explain the differences between var, let, and const in JavaScript.",
     sampleAnswer: `var:
 - Function-scoped
 - Can be re-declared
@@ -397,26 +411,27 @@ console.log(x); // 1
 console.log(y); // ReferenceError
 
 Best practice: Use const by default, let when reassignment needed, avoid var.`,
-    explanation: 'Modern JavaScript uses let and const to provide better scoping and prevent common bugs associated with var.',
+    explanation:
+      "Modern JavaScript uses let and const to provide better scoping and prevent common bugs associated with var.",
     commonMistakes: [
-      'Using var in modern code',
-      'Thinking const makes objects immutable',
-      'Not understanding Temporal Dead Zone'
+      "Using var in modern code",
+      "Thinking const makes objects immutable",
+      "Not understanding Temporal Dead Zone",
     ],
-    techHint: 'Default to const, use let when you need to reassign'
+    techHint: "Default to const, use let when you need to reassign",
   },
 
   {
-    id: 'q10',
-    title: 'Explain event bubbling and event capturing',
-    level: 'mid',
-    language: 'JavaScript',
-    topic: 'Frontend',
+    id: "q10",
+    title: "Explain event bubbling and event capturing",
+    level: "mid",
+    language: "JavaScript",
+    topic: "Frontend",
     timeMinutes: 15,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'Uber',
-    description: 'What are event bubbling and capturing? How do they work?',
+    difficulty: "Medium",
+    company: "Uber",
+    description: "What are event bubbling and capturing? How do they work?",
     sampleAnswer: `Event propagation has 3 phases:
 1. Capturing phase (top to target)
 2. Target phase
@@ -443,26 +458,27 @@ document.querySelector('ul').addEventListener('click', (e) => {
     console.log('List item clicked');
   }
 });`,
-    explanation: 'Understanding event propagation is crucial for event delegation and preventing unwanted event handlers from firing.',
+    explanation:
+      "Understanding event propagation is crucial for event delegation and preventing unwanted event handlers from firing.",
     commonMistakes: [
-      'Not knowing bubbling is default',
-      'Overusing stopPropagation',
-      'Not leveraging event delegation'
+      "Not knowing bubbling is default",
+      "Overusing stopPropagation",
+      "Not leveraging event delegation",
     ],
-    techHint: 'Use event delegation for dynamic content'
+    techHint: "Use event delegation for dynamic content",
   },
 
   {
-    id: 'q11',
-    title: 'What is the Event Loop in JavaScript?',
-    level: 'senior',
-    language: 'JavaScript',
-    topic: 'Frontend',
+    id: "q11",
+    title: "What is the Event Loop in JavaScript?",
+    level: "senior",
+    language: "JavaScript",
+    topic: "Frontend",
     timeMinutes: 25,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Meta',
-    description: 'Explain how the JavaScript event loop works.',
+    difficulty: "Hard",
+    company: "Meta",
+    description: "Explain how the JavaScript event loop works.",
     sampleAnswer: `The event loop allows JavaScript to perform non-blocking operations despite being single-threaded.
 
 Components:
@@ -490,26 +506,27 @@ Why?
 - 1, 4 are synchronous
 - 3 is microtask (runs before macrotasks)
 - 2 is macrotask (setTimeout)`,
-    explanation: 'The event loop is fundamental to understanding asynchronous JavaScript and why certain code executes in a particular order.',
+    explanation:
+      "The event loop is fundamental to understanding asynchronous JavaScript and why certain code executes in a particular order.",
     commonMistakes: [
-      'Thinking setTimeout(fn, 0) executes immediately',
-      'Not understanding microtask priority',
-      'Blocking the event loop with heavy computations'
+      "Thinking setTimeout(fn, 0) executes immediately",
+      "Not understanding microtask priority",
+      "Blocking the event loop with heavy computations",
     ],
-    techHint: 'Microtasks (Promises) run before macrotasks (setTimeout)'
+    techHint: "Microtasks (Promises) run before macrotasks (setTimeout)",
   },
 
   {
-    id: 'q12',
-    title: 'Implement a debounce function from scratch',
-    level: 'senior',
-    language: 'JavaScript',
-    topic: 'Frontend',
+    id: "q12",
+    title: "Implement a debounce function from scratch",
+    level: "senior",
+    language: "JavaScript",
+    topic: "Frontend",
     timeMinutes: 25,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Netflix',
-    description: 'Create a debounce utility function without using libraries.',
+    difficulty: "Hard",
+    company: "Netflix",
+    description: "Create a debounce utility function without using libraries.",
     sampleAnswer: `function debounce(func, delay) {
   let timeoutId;
   
@@ -552,33 +569,35 @@ function debounce(func, delay, immediate = false) {
     if (callNow) func.apply(this, args);
   };
 }`,
-    explanation: 'Debouncing limits the rate at which a function executes. Essential for search inputs, resize handlers, and scroll events to improve performance.',
+    explanation:
+      "Debouncing limits the rate at which a function executes. Essential for search inputs, resize handlers, and scroll events to improve performance.",
     commonMistakes: [
-      'Not clearing previous timeout',
+      "Not clearing previous timeout",
       'Losing "this" context',
-      'Not passing arguments correctly',
-      'Confusing with throttle'
+      "Not passing arguments correctly",
+      "Confusing with throttle",
     ],
-    techHint: 'Debounce delays execution until after inactivity period'
+    techHint: "Debounce delays execution until after inactivity period",
   },
 
   // PREMIUM PYTHON QUESTIONS
   {
-    id: 'q13',
-    title: 'Explain Python list comprehensions',
-    level: 'junior',
-    language: 'Python',
-    topic: 'Backend',
+    id: "q13",
+    title: "Explain Python list comprehensions",
+    level: "junior",
+    language: "Python",
+    topic: "Backend",
     timeMinutes: 12,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Dropbox',
-    description: 'What is the correct syntax for a Python list comprehension that creates a list of squares from 0 to 9?',
+    difficulty: "Easy",
+    company: "Dropbox",
+    description:
+      "What is the correct syntax for a Python list comprehension that creates a list of squares from 0 to 9?",
     options: [
-      '[x**2 for x in range(10)]',
-      '[x*2 for x in range(10)]',
-      'for x in range(10): x**2',
-      '{x**2 for x in range(10)}'
+      "[x**2 for x in range(10)]",
+      "[x*2 for x in range(10)]",
+      "for x in range(10): x**2",
+      "{x**2 for x in range(10)}",
     ],
     correctAnswerIndex: 0,
     sampleAnswer: `List comprehensions provide a concise way to create lists.
@@ -607,26 +626,27 @@ When to use:
 - Simple transformations
 - Filtering
 - When readability isn't sacrificed`,
-    explanation: 'List comprehensions are more concise and often faster than traditional for loops for creating lists.',
+    explanation:
+      "List comprehensions are more concise and often faster than traditional for loops for creating lists.",
     commonMistakes: [
-      'Making comprehensions too complex',
-      'Not considering readability',
-      'Forgetting about generator expressions for large data'
+      "Making comprehensions too complex",
+      "Not considering readability",
+      "Forgetting about generator expressions for large data",
     ],
-    techHint: 'If it needs more than 2 lines, use a regular loop'
+    techHint: "If it needs more than 2 lines, use a regular loop",
   },
 
   {
-    id: 'q14',
-    title: 'What are Python decorators?',
-    level: 'mid',
-    language: 'Python',
-    topic: 'Backend',
+    id: "q14",
+    title: "What are Python decorators?",
+    level: "mid",
+    language: "Python",
+    topic: "Backend",
     timeMinutes: 20,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'Instagram',
-    description: 'Explain decorators in Python with examples.',
+    difficulty: "Medium",
+    company: "Instagram",
+    description: "Explain decorators in Python with examples.",
     sampleAnswer: `Decorators modify or enhance functions without changing their code.
 
 Basic decorator:
@@ -668,27 +688,28 @@ def repeat(times):
 @repeat(3)
 def greet():
     print("Hello!")`,
-    explanation: 'Decorators are a powerful feature for adding functionality to existing functions. They follow the Single Responsibility Principle.',
+    explanation:
+      "Decorators are a powerful feature for adding functionality to existing functions. They follow the Single Responsibility Principle.",
     commonMistakes: [
-      'Not using functools.wraps',
-      'Forgetting to return wrapper function',
-      'Not handling *args and **kwargs',
-      'Confusing decorator syntax'
+      "Not using functools.wraps",
+      "Forgetting to return wrapper function",
+      "Not handling *args and **kwargs",
+      "Confusing decorator syntax",
     ],
-    techHint: '@decorator is syntax sugar for func = decorator(func)'
+    techHint: "@decorator is syntax sugar for func = decorator(func)",
   },
 
   {
-    id: 'q15',
-    title: 'Explain Python generators and yield',
-    level: 'senior',
-    language: 'Python',
-    topic: 'Backend',
+    id: "q15",
+    title: "Explain Python generators and yield",
+    level: "senior",
+    language: "Python",
+    topic: "Backend",
     timeMinutes: 22,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Google',
-    description: 'What are generators and how does yield work?',
+    difficulty: "Hard",
+    company: "Google",
+    description: "What are generators and how does yield work?",
     sampleAnswer: `Generators are functions that return an iterator using yield instead of return.
 
 Basic generator:
@@ -729,28 +750,29 @@ def fibonacci():
 
 fib = fibonacci()
 first_ten = [next(fib) for _ in range(10)]`,
-    explanation: 'Generators are essential for working with large datasets efficiently. They compute values on-the-fly instead of storing everything in memory.',
+    explanation:
+      "Generators are essential for working with large datasets efficiently. They compute values on-the-fly instead of storing everything in memory.",
     commonMistakes: [
-      'Using return instead of yield',
-      'Not understanding lazy evaluation',
-      'Trying to reuse exhausted generators',
-      'Using list() on infinite generators'
+      "Using return instead of yield",
+      "Not understanding lazy evaluation",
+      "Trying to reuse exhausted generators",
+      "Using list() on infinite generators",
     ],
-    techHint: 'Generators are lazy - they only compute when requested'
+    techHint: "Generators are lazy - they only compute when requested",
   },
 
   // PREMIUM REACT QUESTIONS
   {
-    id: 'q16',
-    title: 'What are React Hooks and why were they introduced?',
-    level: 'junior',
-    language: 'React',
-    topic: 'Frontend',
+    id: "q16",
+    title: "What are React Hooks and why were they introduced?",
+    level: "junior",
+    language: "React",
+    topic: "Frontend",
     timeMinutes: 15,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Meta',
-    description: 'Explain React Hooks and their purpose.',
+    difficulty: "Easy",
+    company: "Meta",
+    description: "Explain React Hooks and their purpose.",
     sampleAnswer: `Hooks let you use state and other React features in function components.
 
 Common hooks:
@@ -783,27 +805,28 @@ Why Hooks?
 - Organize related code together
 - Use React features without classes
 - Better code splitting`,
-    explanation: 'Hooks revolutionized React by making function components as powerful as class components while being more composable.',
+    explanation:
+      "Hooks revolutionized React by making function components as powerful as class components while being more composable.",
     commonMistakes: [
-      'Calling hooks conditionally',
-      'Missing dependencies in useEffect',
-      'Not understanding hook rules',
-      'Using useState for everything'
+      "Calling hooks conditionally",
+      "Missing dependencies in useEffect",
+      "Not understanding hook rules",
+      "Using useState for everything",
     ],
-    techHint: 'Hooks must be called at top level, never conditionally'
+    techHint: "Hooks must be called at top level, never conditionally",
   },
 
   {
-    id: 'q17',
-    title: 'Explain useEffect and its cleanup function',
-    level: 'mid',
-    language: 'React',
-    topic: 'Frontend',
+    id: "q17",
+    title: "Explain useEffect and its cleanup function",
+    level: "mid",
+    language: "React",
+    topic: "Frontend",
     timeMinutes: 18,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'Airbnb',
-    description: 'How does useEffect work? When and why do you need cleanup?',
+    difficulty: "Medium",
+    company: "Airbnb",
+    description: "How does useEffect work? When and why do you need cleanup?",
     sampleAnswer: `useEffect runs side effects in function components.
 
 Syntax:
@@ -840,27 +863,28 @@ useEffect(() => {
 When React calls cleanup:
 1. Before re-running effect (deps changed)
 2. When component unmounts`,
-    explanation: 'Cleanup functions prevent memory leaks and ensure your components don\'t have side effects after unmounting.',
+    explanation:
+      "Cleanup functions prevent memory leaks and ensure your components don't have side effects after unmounting.",
     commonMistakes: [
-      'Forgetting cleanup for subscriptions',
-      'Not including all dependencies',
-      'Using async functions directly in useEffect',
-      'Cleanup not being a function'
+      "Forgetting cleanup for subscriptions",
+      "Not including all dependencies",
+      "Using async functions directly in useEffect",
+      "Cleanup not being a function",
     ],
-    techHint: 'Always cleanup what you setup in useEffect'
+    techHint: "Always cleanup what you setup in useEffect",
   },
 
   {
-    id: 'q18',
-    title: 'What is React Context and when should you use it?',
-    level: 'senior',
-    language: 'React',
-    topic: 'Frontend',
+    id: "q18",
+    title: "What is React Context and when should you use it?",
+    level: "senior",
+    language: "React",
+    topic: "Frontend",
     timeMinutes: 20,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Netflix',
-    description: 'Explain React Context API and best practices.',
+    difficulty: "Hard",
+    company: "Netflix",
+    description: "Explain React Context API and best practices.",
     sampleAnswer: `Context provides a way to pass data through the component tree without prop drilling.
 
 Creating Context:
@@ -907,28 +931,29 @@ When to use:
 Better alternatives for state:
 - Redux/Zustand for complex state
 - React Query for server state`,
-    explanation: 'Context is great for global data that changes infrequently. For frequent updates, consider state management libraries.',
+    explanation:
+      "Context is great for global data that changes infrequently. For frequent updates, consider state management libraries.",
     commonMistakes: [
-      'Using Context for all state',
-      'Not memoizing context value',
-      'Causing unnecessary re-renders',
-      'Not providing default value'
+      "Using Context for all state",
+      "Not memoizing context value",
+      "Causing unnecessary re-renders",
+      "Not providing default value",
     ],
-    techHint: 'Wrap context value in useMemo to prevent unnecessary re-renders'
+    techHint: "Wrap context value in useMemo to prevent unnecessary re-renders",
   },
 
   // PREMIUM NODE.JS QUESTIONS
   {
-    id: 'q19',
-    title: 'What is Node.js and how does it work?',
-    level: 'junior',
-    language: 'Node.js',
-    topic: 'Backend',
+    id: "q19",
+    title: "What is Node.js and how does it work?",
+    level: "junior",
+    language: "Node.js",
+    topic: "Backend",
     timeMinutes: 15,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'PayPal',
-    description: 'Explain Node.js and its core concepts.',
+    difficulty: "Easy",
+    company: "PayPal",
+    description: "Explain Node.js and its core concepts.",
     sampleAnswer: `Node.js is a JavaScript runtime built on Chrome's V8 engine for building server-side applications.
 
 Key features:
@@ -963,27 +988,28 @@ Why Node.js?
 - Great for I/O heavy apps
 - Real-time applications
 - Microservices`,
-    explanation: 'Node.js enables JavaScript on the server, making it possible to use one language for full-stack development.',
+    explanation:
+      "Node.js enables JavaScript on the server, making it possible to use one language for full-stack development.",
     commonMistakes: [
-      'Using Node.js for CPU-intensive tasks',
-      'Not handling errors properly',
-      'Blocking the event loop',
-      'Not understanding asynchronous nature'
+      "Using Node.js for CPU-intensive tasks",
+      "Not handling errors properly",
+      "Blocking the event loop",
+      "Not understanding asynchronous nature",
     ],
-    techHint: 'Node.js excels at I/O operations, not CPU-heavy tasks'
+    techHint: "Node.js excels at I/O operations, not CPU-heavy tasks",
   },
 
   {
-    id: 'q20',
-    title: 'Explain middleware in Express.js',
-    level: 'mid',
-    language: 'Node.js',
-    topic: 'Backend',
+    id: "q20",
+    title: "Explain middleware in Express.js",
+    level: "mid",
+    language: "Node.js",
+    topic: "Backend",
     timeMinutes: 18,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'Uber',
-    description: 'What is middleware and how does it work in Express?',
+    difficulty: "Medium",
+    company: "Uber",
+    description: "What is middleware and how does it work in Express?",
     sampleAnswer: `Middleware functions have access to request, response, and next function in the request-response cycle.
 
 Syntax:
@@ -1031,27 +1057,28 @@ const authenticate = (req, res, next) => {
 };
 
 app.use('/api', authenticate);`,
-    explanation: 'Middleware is the backbone of Express.js, enabling modular and reusable request processing logic.',
+    explanation:
+      "Middleware is the backbone of Express.js, enabling modular and reusable request processing logic.",
     commonMistakes: [
-      'Forgetting to call next()',
-      'Wrong middleware order',
-      'Not handling errors in async middleware',
-      'Sending response and calling next()'
+      "Forgetting to call next()",
+      "Wrong middleware order",
+      "Not handling errors in async middleware",
+      "Sending response and calling next()",
     ],
-    techHint: 'Middleware executes in order - place error handlers last'
+    techHint: "Middleware executes in order - place error handlers last",
   },
 
   {
-    id: 'q21',
-    title: 'How does the Node.js Event Loop work?',
-    level: 'senior',
-    language: 'Node.js',
-    topic: 'Backend',
+    id: "q21",
+    title: "How does the Node.js Event Loop work?",
+    level: "senior",
+    language: "Node.js",
+    topic: "Backend",
     timeMinutes: 25,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Stripe',
-    description: 'Explain the Node.js event loop in detail.',
+    difficulty: "Hard",
+    company: "Stripe",
+    description: "Explain the Node.js event loop in detail.",
     sampleAnswer: `The event loop enables Node.js to perform non-blocking I/O operations.
 
 Phases (in order):
@@ -1084,28 +1111,29 @@ Best practices:
 - Avoid blocking operations
 - Use async/await properly
 - Monitor event loop lag`,
-    explanation: 'The event loop is what makes Node.js non-blocking and enables high concurrency despite being single-threaded.',
+    explanation:
+      "The event loop is what makes Node.js non-blocking and enables high concurrency despite being single-threaded.",
     commonMistakes: [
-      'Blocking event loop with sync operations',
-      'Not understanding microtask priority',
-      'Confusing setImmediate vs setTimeout',
-      'Overusing process.nextTick'
+      "Blocking event loop with sync operations",
+      "Not understanding microtask priority",
+      "Confusing setImmediate vs setTimeout",
+      "Overusing process.nextTick",
     ],
-    techHint: 'process.nextTick runs before any I/O, use sparingly'
+    techHint: "process.nextTick runs before any I/O, use sparingly",
   },
 
   // PREMIUM SQL QUESTIONS
   {
-    id: 'q22',
-    title: 'Explain SQL JOIN types',
-    level: 'junior',
-    language: 'SQL',
-    topic: 'Database',
+    id: "q22",
+    title: "Explain SQL JOIN types",
+    level: "junior",
+    language: "SQL",
+    topic: "Database",
     timeMinutes: 15,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Oracle',
-    description: 'What are the different types of SQL JOINs?',
+    difficulty: "Easy",
+    company: "Oracle",
+    description: "What are the different types of SQL JOINs?",
     sampleAnswer: `JOINs combine rows from multiple tables based on related columns.
 
 INNER JOIN:
@@ -1138,27 +1166,28 @@ When to use:
 - RIGHT: Rarely used (use LEFT instead)
 - FULL: All data from both
 - CROSS: Combinations (use carefully)`,
-    explanation: 'Understanding JOINs is fundamental to working with relational databases and retrieving related data.',
+    explanation:
+      "Understanding JOINs is fundamental to working with relational databases and retrieving related data.",
     commonMistakes: [
-      'Using INNER when you need LEFT',
-      'Not understanding NULL in outer joins',
-      'Accidental CROSS JOINs from missing ON',
-      'Wrong join order affecting results'
+      "Using INNER when you need LEFT",
+      "Not understanding NULL in outer joins",
+      "Accidental CROSS JOINs from missing ON",
+      "Wrong join order affecting results",
     ],
-    techHint: 'LEFT JOIN keeps all left table rows, even without matches'
+    techHint: "LEFT JOIN keeps all left table rows, even without matches",
   },
 
   {
-    id: 'q23',
-    title: 'What are SQL indexes and when should you use them?',
-    level: 'mid',
-    language: 'SQL',
-    topic: 'Database',
+    id: "q23",
+    title: "What are SQL indexes and when should you use them?",
+    level: "mid",
+    language: "SQL",
+    topic: "Database",
     timeMinutes: 18,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'Amazon',
-    description: 'Explain database indexes and their trade-offs.',
+    difficulty: "Medium",
+    company: "Amazon",
+    description: "Explain database indexes and their trade-offs.",
     sampleAnswer: `Indexes are data structures that improve query performance.
 
 Creating indexes:
@@ -1202,27 +1231,29 @@ SELECT * FROM users WHERE email = 'user@example.com';
 
 -- With index: Uses index
 CREATE INDEX idx_email ON users(email);`,
-    explanation: 'Indexes are crucial for database performance but come with trade-offs. Understanding when and where to use them is key to optimization.',
+    explanation:
+      "Indexes are crucial for database performance but come with trade-offs. Understanding when and where to use them is key to optimization.",
     commonMistakes: [
-      'Over-indexing tables',
-      'Indexing low-cardinality columns',
-      'Not considering composite indexes',
-      'Forgetting to update statistics'
+      "Over-indexing tables",
+      "Indexing low-cardinality columns",
+      "Not considering composite indexes",
+      "Forgetting to update statistics",
     ],
-    techHint: 'Index columns you query often, not columns you update often'
+    techHint: "Index columns you query often, not columns you update often",
   },
 
   {
-    id: 'q24',
-    title: 'Explain database normalization',
-    level: 'senior',
-    language: 'SQL',
-    topic: 'Database',
+    id: "q24",
+    title: "Explain database normalization",
+    level: "senior",
+    language: "SQL",
+    topic: "Database",
     timeMinutes: 22,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Google',
-    description: 'What is database normalization and what are the normal forms?',
+    difficulty: "Hard",
+    company: "Google",
+    description:
+      "What is database normalization and what are the normal forms?",
     sampleAnswer: `Normalization organizes data to reduce redundancy and improve integrity.
 
 Normal Forms:
@@ -1271,28 +1302,29 @@ When to denormalize:
 - Performance optimization
 - Reporting/analytics
 - Reduce complex joins`,
-    explanation: 'Normalization prevents data anomalies and redundancy. However, sometimes denormalization is needed for performance.',
+    explanation:
+      "Normalization prevents data anomalies and redundancy. However, sometimes denormalization is needed for performance.",
     commonMistakes: [
-      'Over-normalizing for read-heavy apps',
-      'Not understanding trade-offs',
-      'Forgetting about query performance',
-      'Mixing normalized and denormalized data'
+      "Over-normalizing for read-heavy apps",
+      "Not understanding trade-offs",
+      "Forgetting about query performance",
+      "Mixing normalized and denormalized data",
     ],
-    techHint: 'Normalize for data integrity, denormalize for performance'
+    techHint: "Normalize for data integrity, denormalize for performance",
   },
 
   // PREMIUM JAVA QUESTIONS
   {
-    id: 'q25',
-    title: 'Explain Java OOP principles',
-    level: 'junior',
-    language: 'Java',
-    topic: 'Backend',
+    id: "q25",
+    title: "Explain Java OOP principles",
+    level: "junior",
+    language: "Java",
+    topic: "Backend",
     timeMinutes: 18,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Oracle',
-    description: 'What are the four main OOP principles in Java?',
+    difficulty: "Easy",
+    company: "Oracle",
+    description: "What are the four main OOP principles in Java?",
     sampleAnswer: `Four pillars of OOP:
 
 1. Encapsulation:
@@ -1343,27 +1375,28 @@ public abstract class Shape {
 public interface Drawable {
     void draw();
 }`,
-    explanation: 'These four principles are the foundation of object-oriented programming and essential for designing maintainable systems.',
+    explanation:
+      "These four principles are the foundation of object-oriented programming and essential for designing maintainable systems.",
     commonMistakes: [
-      'Confusing inheritance with composition',
-      'Breaking encapsulation with public fields',
-      'Overusing inheritance',
-      'Not understanding polymorphism'
+      "Confusing inheritance with composition",
+      "Breaking encapsulation with public fields",
+      "Overusing inheritance",
+      "Not understanding polymorphism",
     ],
-    techHint: 'Favor composition over inheritance when possible'
+    techHint: "Favor composition over inheritance when possible",
   },
 
   {
-    id: 'q26',
-    title: 'What are Java Streams and how do you use them?',
-    level: 'mid',
-    language: 'Java',
-    topic: 'Backend',
+    id: "q26",
+    title: "What are Java Streams and how do you use them?",
+    level: "mid",
+    language: "Java",
+    topic: "Backend",
     timeMinutes: 20,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'LinkedIn',
-    description: 'Explain Java Stream API and common operations.',
+    difficulty: "Medium",
+    company: "LinkedIn",
+    description: "Explain Java Stream API and common operations.",
     sampleAnswer: `Streams provide a functional approach to processing collections.
 
 Creating streams:
@@ -1408,27 +1441,29 @@ Parallel streams:
 long count = bigList.parallelStream()
     .filter(predicate)
     .count();`,
-    explanation: 'Streams enable declarative, functional-style operations on collections. They\'re lazy and can be parallelized for better performance.',
+    explanation:
+      "Streams enable declarative, functional-style operations on collections. They're lazy and can be parallelized for better performance.",
     commonMistakes: [
-      'Reusing streams (they\'re one-time use)',
-      'Not understanding lazy evaluation',
-      'Overusing parallel streams',
-      'Side effects in stream operations'
+      "Reusing streams (they're one-time use)",
+      "Not understanding lazy evaluation",
+      "Overusing parallel streams",
+      "Side effects in stream operations",
     ],
-    techHint: 'Streams are lazy - operations only execute when terminal operation is called'
+    techHint:
+      "Streams are lazy - operations only execute when terminal operation is called",
   },
 
   {
-    id: 'q27',
-    title: 'Explain Java memory management and garbage collection',
-    level: 'senior',
-    language: 'Java',
-    topic: 'Backend',
+    id: "q27",
+    title: "Explain Java memory management and garbage collection",
+    level: "senior",
+    language: "Java",
+    topic: "Backend",
     timeMinutes: 25,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Google',
-    description: 'How does Java manage memory and what is garbage collection?',
+    difficulty: "Hard",
+    company: "Google",
+    description: "How does Java manage memory and what is garbage collection?",
     sampleAnswer: `Java memory is divided into several areas:
 
 Memory Areas:
@@ -1472,28 +1507,30 @@ Best practices:
 - Don't hold unnecessary references
 - Use weak references when appropriate
 - Profile memory usage`,
-    explanation: 'Understanding memory management is crucial for writing efficient Java applications and preventing memory leaks.',
+    explanation:
+      "Understanding memory management is crucial for writing efficient Java applications and preventing memory leaks.",
     commonMistakes: [
-      'Assuming immediate garbage collection',
-      'Calling System.gc() unnecessarily',
-      'Not closing resources',
-      'Creating unnecessary objects in loops'
+      "Assuming immediate garbage collection",
+      "Calling System.gc() unnecessarily",
+      "Not closing resources",
+      "Creating unnecessary objects in loops",
     ],
-    techHint: 'Objects are GC eligible when no references exist to them'
+    techHint: "Objects are GC eligible when no references exist to them",
   },
 
   // PREMIUM RUBY QUESTIONS
   {
-    id: 'q28',
-    title: 'What are Ruby blocks, procs, and lambdas?',
-    level: 'junior',
-    language: 'Ruby',
-    topic: 'Backend',
+    id: "q28",
+    title: "What are Ruby blocks, procs, and lambdas?",
+    level: "junior",
+    language: "Ruby",
+    topic: "Backend",
     timeMinutes: 15,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Shopify',
-    description: 'Explain the differences between blocks, procs, and lambdas in Ruby.',
+    difficulty: "Easy",
+    company: "Shopify",
+    description:
+      "Explain the differences between blocks, procs, and lambdas in Ruby.",
     sampleAnswer: `Blocks, Procs, and Lambdas are ways to pass code around in Ruby.
 
 Blocks:
@@ -1533,27 +1570,28 @@ Key differences:
 
 Use blocks for single-use code
 Use Procs/Lambdas for reusable code`,
-    explanation: 'Understanding blocks, procs, and lambdas is essential for writing idiomatic Ruby code and working with higher-order functions.',
+    explanation:
+      "Understanding blocks, procs, and lambdas is essential for writing idiomatic Ruby code and working with higher-order functions.",
     commonMistakes: [
-      'Confusing Proc and Lambda behavior',
-      'Not understanding return differences',
-      'Forgetting argument count checking',
-      'Using wrong syntax for each'
+      "Confusing Proc and Lambda behavior",
+      "Not understanding return differences",
+      "Forgetting argument count checking",
+      "Using wrong syntax for each",
     ],
-    techHint: 'Lambdas are stricter, Procs are more flexible'
+    techHint: "Lambdas are stricter, Procs are more flexible",
   },
 
   {
-    id: 'q29',
-    title: 'Explain Ruby modules and mixins',
-    level: 'mid',
-    language: 'Ruby',
-    topic: 'Backend',
+    id: "q29",
+    title: "Explain Ruby modules and mixins",
+    level: "mid",
+    language: "Ruby",
+    topic: "Backend",
     timeMinutes: 18,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'GitHub',
-    description: 'What are modules in Ruby and how do mixins work?',
+    difficulty: "Medium",
+    company: "GitHub",
+    description: "What are modules in Ruby and how do mixins work?",
     sampleAnswer: `Modules are containers for methods, classes, and constants. They provide namespacing and mixins.
 
 Namespacing:
@@ -1617,27 +1655,28 @@ Method lookup order:
 2. Included modules (reverse order)
 3. Superclass
 4. Superclass modules`,
-    explanation: 'Modules enable code reuse without inheritance. Ruby uses single inheritance but multiple mixins.',
+    explanation:
+      "Modules enable code reuse without inheritance. Ruby uses single inheritance but multiple mixins.",
     commonMistakes: [
-      'Confusing include vs extend',
-      'Not understanding method lookup order',
-      'Overusing modules instead of composition',
-      'Circular module dependencies'
+      "Confusing include vs extend",
+      "Not understanding method lookup order",
+      "Overusing modules instead of composition",
+      "Circular module dependencies",
     ],
-    techHint: 'include = instance methods, extend = class methods'
+    techHint: "include = instance methods, extend = class methods",
   },
 
   {
-    id: 'q30',
-    title: 'What is metaprogramming in Ruby?',
-    level: 'senior',
-    language: 'Ruby',
-    topic: 'Backend',
+    id: "q30",
+    title: "What is metaprogramming in Ruby?",
+    level: "senior",
+    language: "Ruby",
+    topic: "Backend",
     timeMinutes: 25,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Basecamp',
-    description: 'Explain metaprogramming in Ruby with practical examples.',
+    difficulty: "Hard",
+    company: "Basecamp",
+    description: "Explain metaprogramming in Ruby with practical examples.",
     sampleAnswer: `Metaprogramming is writing code that writes code at runtime.
 
 define_method:
@@ -1707,28 +1746,30 @@ Dangers:
 - Performance overhead
 - Breaking tools (IDE, linters)
 - Unclear code flow`,
-    explanation: 'Metaprogramming is powerful but should be used sparingly. It\'s the foundation of Rails and many Ruby gems.',
+    explanation:
+      "Metaprogramming is powerful but should be used sparingly. It's the foundation of Rails and many Ruby gems.",
     commonMistakes: [
-      'Overusing metaprogramming',
-      'Not implementing respond_to_missing?',
-      'Creating unmaintainable code',
-      'Ignoring performance implications'
+      "Overusing metaprogramming",
+      "Not implementing respond_to_missing?",
+      "Creating unmaintainable code",
+      "Ignoring performance implications",
     ],
-    techHint: 'Use metaprogramming to reduce duplication, not to be clever'
+    techHint: "Use metaprogramming to reduce duplication, not to be clever",
   },
 
   // PREMIUM TYPESCRIPT QUESTIONS
   {
-    id: 'q31',
-    title: 'What are TypeScript interfaces and types?',
-    level: 'junior',
-    language: 'TypeScript',
-    topic: 'Frontend',
+    id: "q31",
+    title: "What are TypeScript interfaces and types?",
+    level: "junior",
+    language: "TypeScript",
+    topic: "Frontend",
     timeMinutes: 15,
     isFree: false,
-    difficulty: 'Easy',
-    company: 'Microsoft',
-    description: 'Explain the difference between interfaces and type aliases in TypeScript.',
+    difficulty: "Easy",
+    company: "Microsoft",
+    description:
+      "Explain the difference between interfaces and type aliases in TypeScript.",
     sampleAnswer: `Interfaces and type aliases both define object shapes, but have key differences.
 
 Interface:
@@ -1793,27 +1834,28 @@ type Status = 'active' | 'inactive';
 When to use:
 - Interface: Object shapes, classes, public APIs
 - Type: Unions, intersections, computed properties`,
-    explanation: 'Both interfaces and types have their use cases. Interfaces are better for object-oriented patterns, types for functional patterns.',
+    explanation:
+      "Both interfaces and types have their use cases. Interfaces are better for object-oriented patterns, types for functional patterns.",
     commonMistakes: [
-      'Using types when interfaces are clearer',
-      'Not leveraging declaration merging',
-      'Confusing extends vs intersection',
-      'Over-complicating type definitions'
+      "Using types when interfaces are clearer",
+      "Not leveraging declaration merging",
+      "Confusing extends vs intersection",
+      "Over-complicating type definitions",
     ],
-    techHint: 'Prefer interfaces for objects, types for everything else'
+    techHint: "Prefer interfaces for objects, types for everything else",
   },
 
   {
-    id: 'q32',
-    title: 'Explain TypeScript generics',
-    level: 'mid',
-    language: 'TypeScript',
-    topic: 'Frontend',
+    id: "q32",
+    title: "Explain TypeScript generics",
+    level: "mid",
+    language: "TypeScript",
+    topic: "Frontend",
     timeMinutes: 20,
     isFree: false,
-    difficulty: 'Medium',
-    company: 'Airbnb',
-    description: 'What are generics and how do you use them in TypeScript?',
+    difficulty: "Medium",
+    company: "Airbnb",
+    description: "What are generics and how do you use them in TypeScript?",
     sampleAnswer: `Generics allow creating reusable, type-safe components.
 
 Basic Generic Function:
@@ -1879,27 +1921,29 @@ Multiple Type Parameters:
 function merge<T, U>(obj1: T, obj2: U): T & U {
   return { ...obj1, ...obj2 };
 }`,
-    explanation: 'Generics enable type-safe reusable code. They\'re essential for libraries and utility functions.',
+    explanation:
+      "Generics enable type-safe reusable code. They're essential for libraries and utility functions.",
     commonMistakes: [
-      'Not using constraints when needed',
-      'Over-constraining generics',
-      'Using any instead of generics',
-      'Forgetting default type parameters'
+      "Not using constraints when needed",
+      "Over-constraining generics",
+      "Using any instead of generics",
+      "Forgetting default type parameters",
     ],
-    techHint: 'Generics = type parameters for functions/classes'
+    techHint: "Generics = type parameters for functions/classes",
   },
 
   {
-    id: 'q33',
-    title: 'Advanced TypeScript: Utility types and mapped types',
-    level: 'senior',
-    language: 'TypeScript',
-    topic: 'Frontend',
+    id: "q33",
+    title: "Advanced TypeScript: Utility types and mapped types",
+    level: "senior",
+    language: "TypeScript",
+    topic: "Frontend",
     timeMinutes: 25,
     isFree: false,
-    difficulty: 'Hard',
-    company: 'Stripe',
-    description: 'Explain TypeScript utility types and how to create custom mapped types.',
+    difficulty: "Hard",
+    company: "Stripe",
+    description:
+      "Explain TypeScript utility types and how to create custom mapped types.",
     sampleAnswer: `TypeScript provides built-in utility types and allows creating custom ones.
 
 Built-in Utility Types:
@@ -1972,13 +2016,14 @@ Template Literal Types:
 type EventName = 'click' | 'focus' | 'blur';
 type EventHandler = \`on\${Capitalize<EventName>}\`;
 // "onClick" | "onFocus" | "onBlur"`,
-    explanation: 'Utility and mapped types enable powerful type transformations. They\'re essential for building type-safe libraries.',
+    explanation:
+      "Utility and mapped types enable powerful type transformations. They're essential for building type-safe libraries.",
     commonMistakes: [
-      'Not understanding keyof and typeof',
-      'Misusing conditional types',
-      'Creating overly complex types',
-      'Not leveraging built-in utilities'
+      "Not understanding keyof and typeof",
+      "Misusing conditional types",
+      "Creating overly complex types",
+      "Not leveraging built-in utilities",
     ],
-    techHint: 'Master built-in utilities before creating custom ones'
+    techHint: "Master built-in utilities before creating custom ones",
   },
 ];

@@ -3,19 +3,24 @@ import {
   getPractices,
   getPracticeById,
 } from "../../services/practicesService";
-import { practicesListState } from "../atoms/practicesAtoms";
 import type {
   GetPracticesQuery,
+  GetPracticesResponse,
   PracticeDetail,
 } from "../../services/types";
 
-export const practicesQuerySelector = selectorFamily({
+export const practicesQuerySelector = selectorFamily<
+  GetPracticesResponse | null,
+  { query?: GetPracticesQuery; enabled: boolean }
+>({
   key: "practicesQuerySelector",
   get:
-    (query: GetPracticesQuery | undefined) =>
-    async ({ set }) => {
-      const res = await getPractices(query);
-      set(practicesListState, res);
+    (params) =>
+    async () => {
+      if (!params.enabled) {
+        return null;
+      }
+      const res = await getPractices(params.query);
       return res;
     },
 });

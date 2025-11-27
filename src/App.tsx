@@ -1,24 +1,30 @@
-import { useState, useEffect } from 'react';
-import { Navigation } from './components/Navigation';
-import { HomePage } from './components/HomePage';
-import { QuestionLibrary } from './components/QuestionLibrary';
-import { PracticeMode } from './components/PracticeMode';
-import { CodingChallenges } from './components/CodingChallenges';
-import { HintsPage } from './components/HintsPage';
-import { Dashboard } from './components/Dashboard';
-import { PricingPage } from './components/PricingPage';
-import { OnboardingModal } from './components/OnboardingModal';
-import { PaywallModal } from './components/PaywallModal';
-import { AuthModal } from './components/AuthModal';
-import { useUserProgress } from './hooks/useUserProgress';
-import { useAuth } from './hooks/useAuth';
-import { questions } from './data/questions';
-import { codingChallenges } from './data/challenges';
-import { Level, Language } from './types';
-import { Toaster } from './components/ui/sonner';
-import { toast } from 'sonner@2.0.3';
+import React, { useState, useEffect } from "react";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useParams,
+  useLocation,
+} from "react-router-dom";
+import { Navigation } from "./components/Navigation";
+import { HomePage } from "./components/HomePage";
+import { QuestionLibrary } from "./components/QuestionLibrary";
+import { PracticeMode } from "./components/PracticeMode";
+import { CodingChallenges } from "./components/CodingChallenges";
+import { HintsPage } from "./components/HintsPage";
+import { Dashboard } from "./components/Dashboard";
+import { PricingPage } from "./components/PricingPage";
+import { OnboardingModal } from "./components/OnboardingModal";
+import { PaywallModal } from "./components/PaywallModal";
+import { AuthModal } from "./components/AuthModal";
+import { useUserProgress } from "./hooks/useUserProgress";
+import { useAuth } from "./hooks/useAuth";
+import { questions } from "./data/questions";
+import { codingChallenges } from "./data/challenges";
+import { Level, Language } from "./types";
+import { Toaster } from "./components/ui/sonner";
+import { toast } from "sonner@2.0.3";
 
-type Page = 'home' | 'questions' | 'practice' | 'challenges' | 'hints' | 'pricing' | 'dashboard';
 type User = { email: string; name: string } | null;
 
 interface UserPreferences {
@@ -27,50 +33,53 @@ interface UserPreferences {
 }
 
 export default function App() {
-  const { user: firebaseUser, loading: authLoading, logout: firebaseLogout } = useAuth();
-  const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const {
+    user: firebaseUser,
+    loading: authLoading,
+    logout: firebaseLogout,
+  } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
-  
+  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+
   // Convert Firebase user to app user format
-  const user: User = firebaseUser ? {
-    email: firebaseUser.email,
-    name: firebaseUser.name
-  } : null;
-  
-  const [userPreferences, setUserPreferences] = useState<UserPreferences>(() => {
-    // Load preferences from localStorage
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('userPreferences');
-      return stored ? JSON.parse(stored) : { levels: [], languages: [] };
+  const user: User = firebaseUser
+    ? {
+        email: firebaseUser.email,
+        name: firebaseUser.name,
+      }
+    : null;
+
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>(
+    () => {
+      // Load preferences from localStorage
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("userPreferences");
+        return stored ? JSON.parse(stored) : { levels: [], languages: [] };
+      }
+      return { levels: [], languages: [] };
     }
-    return { levels: [], languages: [] };
-  });
-  
+  );
+
   const {
     progress,
     completeQuestion,
     unlockAll,
     canAccessQuestion,
-    shouldShowPaywall
+    shouldShowPaywall,
   } = useUserProgress();
 
   // Save user preferences to localStorage
   useEffect(() => {
-    localStorage.setItem('userPreferences', JSON.stringify(userPreferences));
+    localStorage.setItem("userPreferences", JSON.stringify(userPreferences));
   }, [userPreferences]);
 
-  const selectedQuestion = selectedQuestionId 
-    ? questions.find(q => q.id === selectedQuestionId)
-    : null;
-
-  const handleNavigate = (page: Page) => {
-    setCurrentPage(page);
-    setSelectedQuestionId(null);
-  };
+  // Get current page from location pathname
+  const currentPage =
+    location.pathname === "/" ? "home" : location.pathname.slice(1);
 
   const handleStartFree = () => {
     setShowOnboarding(true);
@@ -79,39 +88,42 @@ export default function App() {
   const handleOnboardingComplete = (levels: Level[], languages: Language[]) => {
     // Save user preferences
     setUserPreferences({ levels, languages });
-    
+
     // Navigate to questions page
-    setCurrentPage('questions');
-    toast.success('Preferences saved! Browse questions matching your selections.');
+    navigate("/questions");
+    toast.success(
+      "Preferences saved! Browse questions matching your selections."
+    );
   };
 
   const handleSelectQuestion = (questionId: string) => {
-    const question = questions.find(q => q.id === questionId);
+    const question = questions.find((q) => q.id === questionId);
     if (!question) return;
 
     // Check if user can access this question
     if (canAccessQuestion(question.isFree)) {
-      setSelectedQuestionId(questionId);
-      setCurrentPage('practice');
+      navigate(`/practice/${questionId}`);
     } else if (shouldShowPaywall(question.isFree)) {
       setShowPaywall(true);
     } else {
       // Not free and haven't used all free questions yet
-      toast.error('Complete your free questions first or unlock premium access');
+      toast.error(
+        "Complete your free questions first or unlock premium access"
+      );
     }
   };
 
   const handleCompleteQuestion = (questionId: string) => {
-    const question = questions.find(q => q.id === questionId);
+    const question = questions.find((q) => q.id === questionId);
     if (question) {
       completeQuestion(questionId, question.isFree);
-      
+
       if (question.isFree && progress.freeQuestionsUsed + 1 >= 3) {
-        toast.success('Question completed! You\'ve used all free questions.', {
-          description: 'Unlock premium for full access to 200+ questions'
+        toast.success("Question completed! You've used all free questions.", {
+          description: "Unlock premium for full access to 200+ questions",
         });
       } else {
-        toast.success('Question completed!');
+        toast.success("Question completed!");
       }
     }
   };
@@ -122,16 +134,16 @@ export default function App() {
 
   const handleUnlockComplete = () => {
     unlockAll();
-    toast.success('🎉 Premium unlocked! You now have access to all questions.');
+    toast.success("🎉 Premium unlocked! You now have access to all questions.");
   };
 
   const handleLogin = () => {
-    setAuthMode('login');
+    setAuthMode("login");
     setShowAuth(true);
   };
 
   const handleSignup = () => {
-    setAuthMode('signup');
+    setAuthMode("signup");
     setShowAuth(true);
   };
 
@@ -143,89 +155,90 @@ export default function App() {
   const handleLogout = async () => {
     const result = await firebaseLogout();
     if (result.success) {
-      toast.info('Logged out successfully');
+      toast.info("Logged out successfully");
     } else {
-      toast.error(result.error || 'Failed to logout');
+      toast.error(result.error || "Failed to logout");
     }
   };
 
   const handleLoginRequired = () => {
-    setAuthMode('login');
+    setAuthMode("login");
     setShowAuth(true);
-    toast.info('Please login to continue');
+    toast.info("Please login to continue");
   };
 
   const handleBackFromPractice = () => {
-    setCurrentPage('questions');
-    setSelectedQuestionId(null);
+    navigate("/questions");
   };
 
   return (
     <div className="min-h-screen bg-white">
       <Navigation
         currentPage={currentPage}
-        onNavigate={handleNavigate}
         hasUnlocked={progress.hasUnlocked}
         user={user}
         onLogin={handleLogin}
         onLogout={handleLogout}
       />
 
-      {currentPage === 'home' && (
-        <HomePage
-          questions={questions}
-          onStartFree={handleStartFree}
-          onSelectQuestion={handleSelectQuestion}
-          onUnlock={handleUnlock}
-          hasUnlocked={progress.hasUnlocked}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              questions={questions}
+              onStartFree={handleStartFree}
+              onSelectQuestion={handleSelectQuestion}
+              onUnlock={handleUnlock}
+              hasUnlocked={progress.hasUnlocked}
+            />
+          }
         />
-      )}
-
-      {currentPage === 'questions' && (
-        <QuestionLibrary
-          questions={questions}
-          onSelectQuestion={handleSelectQuestion}
-          hasUnlocked={progress.hasUnlocked}
-          onUnlock={handleUnlock}
-          userPreferences={userPreferences}
+        <Route
+          path="/questions"
+          element={
+            <QuestionLibrary
+              questions={questions}
+              onSelectQuestion={handleSelectQuestion}
+              hasUnlocked={progress.hasUnlocked}
+              onUnlock={handleUnlock}
+              userPreferences={userPreferences}
+            />
+          }
         />
-      )}
-
-      {currentPage === 'practice' && selectedQuestion && (
-        <PracticeMode
-          question={selectedQuestion}
-          onBack={handleBackFromPractice}
-          onComplete={handleCompleteQuestion}
-          hasUnlocked={progress.hasUnlocked}
-          freeQuestionsUsed={progress.freeQuestionsUsed}
+        <Route path="/practice/:questionId" element={<PracticeModeWrapper />} />
+        <Route
+          path="/challenges"
+          element={
+            <CodingChallenges
+              challenges={codingChallenges}
+              hasUnlocked={progress.hasUnlocked}
+              onUnlock={handleUnlock}
+            />
+          }
         />
-      )}
-
-      {currentPage === 'challenges' && (
-        <CodingChallenges
-          challenges={codingChallenges}
-          hasUnlocked={progress.hasUnlocked}
-          onUnlock={handleUnlock}
+        <Route path="/hints" element={<HintsPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <Dashboard
+              completedQuestions={progress.questionsCompleted}
+              questions={questions}
+              onSelectQuestion={handleSelectQuestion}
+              hasUnlocked={progress.hasUnlocked}
+            />
+          }
         />
-      )}
-
-      {currentPage === 'hints' && <HintsPage />}
-
-      {currentPage === 'dashboard' && (
-        <Dashboard
-          completedQuestions={progress.questionsCompleted}
-          questions={questions}
-          onSelectQuestion={handleSelectQuestion}
-          hasUnlocked={progress.hasUnlocked}
+        <Route
+          path="/pricing"
+          element={
+            <PricingPage
+              hasUnlocked={progress.hasUnlocked}
+              onUnlock={handleUnlock}
+            />
+          }
         />
-      )}
-
-      {currentPage === 'pricing' && (
-        <PricingPage
-          hasUnlocked={progress.hasUnlocked}
-          onUnlock={handleUnlock}
-        />
-      )}
+      </Routes>
 
       <OnboardingModal
         isOpen={showOnboarding}
@@ -262,5 +275,57 @@ export default function App() {
 
       <Toaster position="top-center" />
     </div>
+  );
+}
+
+// Wrapper component for PracticeMode to handle URL params
+function PracticeModeWrapper() {
+  const { questionId } = useParams<{ questionId: string }>();
+  const navigate = useNavigate();
+  const { progress, completeQuestion, canAccessQuestion, shouldShowPaywall } =
+    useUserProgress();
+
+  const question = questions.find((q) => q.id === questionId);
+
+  if (!question) {
+    navigate("/questions");
+    return null;
+  }
+
+  // Check if user can access this question
+  if (!canAccessQuestion(question.isFree)) {
+    if (shouldShowPaywall(question.isFree)) {
+      // This will be handled by the parent App component's paywall state
+      navigate("/questions");
+      return null;
+    } else {
+      navigate("/questions");
+      return null;
+    }
+  }
+
+  const handleComplete = (qId: string) => {
+    const q = questions.find((qu) => qu.id === qId);
+    if (q) {
+      completeQuestion(qId, q.isFree);
+
+      if (q.isFree && progress.freeQuestionsUsed + 1 >= 3) {
+        toast.success("Question completed! You've used all free questions.", {
+          description: "Unlock premium for full access to 200+ questions",
+        });
+      } else {
+        toast.success("Question completed!");
+      }
+    }
+  };
+
+  return (
+    <PracticeMode
+      question={question}
+      onBack={() => navigate("/questions")}
+      onComplete={handleComplete}
+      hasUnlocked={progress.hasUnlocked}
+      freeQuestionsUsed={progress.freeQuestionsUsed}
+    />
   );
 }

@@ -1,31 +1,34 @@
 import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Code2, Home, BookOpen, Lightbulb, CreditCard, User, LogOut, Menu, X, Code } from 'lucide-react';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
 
 interface NavigationProps {
   currentPage: string;
-  onNavigate: (page: string) => void;
   hasUnlocked: boolean;
   user: { email: string; name: string } | null;
   onLogin: () => void;
   onLogout: () => void;
 }
 
-export function Navigation({ currentPage, onNavigate, hasUnlocked, user, onLogin, onLogout }: NavigationProps) {
+export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout }: NavigationProps) {
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'questions', label: 'Questions', icon: BookOpen },
-    { id: 'challenges', label: 'Practice', icon: Code },
-    { id: 'hints', label: 'Hints', icon: Lightbulb },
-    { id: 'pricing', label: 'Pricing', icon: CreditCard },
+    { id: 'home', path: '/', label: 'Home', icon: Home },
+    { id: 'questions', path: '/questions', label: 'Questions', icon: BookOpen },
+    { id: 'challenges', path: '/challenges', label: 'Practice', icon: Code },
+    { id: 'hints', path: '/hints', label: 'Hints', icon: Lightbulb },
+    { id: 'pricing', path: '/pricing', label: 'Pricing', icon: CreditCard },
   ];
 
-  const handleNavigate = (page: string) => {
-    onNavigate(page);
-    setMobileMenuOpen(false);
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -33,25 +36,25 @@ export function Navigation({ currentPage, onNavigate, hasUnlocked, user, onLogin
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-4 md:gap-8">
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleNavigate('home')}>
+            <Link to="/" className="flex items-center gap-2 cursor-pointer">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Code2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <span className="text-lg sm:text-xl">codeinterview</span>
-            </div>
+            </Link>
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1">
               {navItems.map(item => (
-                <Button
-                  key={item.id}
-                  variant={currentPage === item.id ? 'default' : 'ghost'}
-                  onClick={() => onNavigate(item.id)}
-                  className="gap-2"
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                </Button>
+                <Link key={item.id} to={item.path}>
+                  <Button
+                    variant={isActive(item.path) ? 'default' : 'ghost'}
+                    className="gap-2"
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.label}
+                  </Button>
+                </Link>
               ))}
             </div>
           </div>
@@ -66,15 +69,16 @@ export function Navigation({ currentPage, onNavigate, hasUnlocked, user, onLogin
             
             {user ? (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleNavigate('dashboard')}
-                  className="gap-2 hidden sm:flex"
-                >
-                  <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">{user.name}</span>
-                </Button>
+                <Link to="/dashboard">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 hidden sm:flex"
+                  >
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">{user.name}</span>
+                  </Button>
+                </Link>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -149,26 +153,36 @@ export function Navigation({ currentPage, onNavigate, hasUnlocked, user, onLogin
                   {/* Navigation Items */}
                   <div className="space-y-2">
                     {navItems.map(item => (
-                      <Button
+                      <Link
                         key={item.id}
-                        variant={currentPage === item.id ? 'default' : 'ghost'}
-                        onClick={() => handleNavigate(item.id)}
-                        className="w-full justify-start gap-3"
+                        to={item.path}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block"
                       >
-                        <item.icon className="w-5 h-5" />
-                        {item.label}
-                      </Button>
+                        <Button
+                          variant={isActive(item.path) ? 'default' : 'ghost'}
+                          className="w-full justify-start gap-3"
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {item.label}
+                        </Button>
+                      </Link>
                     ))}
                     
                     {user && (
-                      <Button
-                        variant={currentPage === 'dashboard' ? 'default' : 'ghost'}
-                        onClick={() => handleNavigate('dashboard')}
-                        className="w-full justify-start gap-3"
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block"
                       >
-                        <User className="w-5 h-5" />
-                        Dashboard
-                      </Button>
+                        <Button
+                          variant={isActive('/dashboard') ? 'default' : 'ghost'}
+                          className="w-full justify-start gap-3"
+                        >
+                          <User className="w-5 h-5" />
+                          Dashboard
+                        </Button>
+                      </Link>
                     )}
                   </div>
 

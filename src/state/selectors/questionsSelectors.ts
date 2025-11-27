@@ -1,18 +1,27 @@
 import { selectorFamily } from "recoil";
 import { getQuestions, getQuestionById } from "../../services/questionsService";
-import { questionsListState } from "../atoms/questionsAtoms";
 import type {
   GetQuestionsQuery,
+  GetQuestionsResponse,
   Question,
 } from "../../services/types";
 
-export const questionsQuerySelector = selectorFamily({
+// Fetch questions directly from the API.
+// Recoil selector `get` callbacks only receive `{ get }`, not `{ set }`,
+// so trying to call `set` here causes a runtime error and prevents data
+// from reaching the UI.
+export const questionsQuerySelector = selectorFamily<
+  GetQuestionsResponse | null,
+  { query?: GetQuestionsQuery; enabled: boolean }
+>({
   key: "questionsQuerySelector",
   get:
-    (query: GetQuestionsQuery | undefined) =>
-    async ({ set }) => {
-      const res = await getQuestions(query);
-      set(questionsListState, res);
+    (params) =>
+    async () => {
+      if (!params.enabled) {
+        return null;
+      }
+      const res = await getQuestions(params.query);
       return res;
     },
 });
