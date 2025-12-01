@@ -10,9 +10,10 @@ interface NavigationProps {
   user: { email: string; name: string } | null;
   onLogin: () => void;
   onLogout: () => void;
+  onProtectedRouteClick?: () => void;
 }
 
-export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout }: NavigationProps) {
+export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout, onProtectedRouteClick }: NavigationProps) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -58,17 +59,40 @@ export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout }
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1">
-              {navItems.map(item => (
-                <Link key={item.id} to={item.path}>
-                  <Button
-                    variant={isActive(item.path) ? 'default' : 'ghost'}
-                    className="gap-2"
-                  >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
-                  </Button>
-                </Link>
-              ))}
+              {navItems.map(item => {
+                const isProtected = !user && (item.path === '/questions' || item.path === '/practices' || item.path === '/hints' || item.path === '/pricing');
+                
+                if (isProtected) {
+                  return (
+                    <Button
+                      key={item.id}
+                      variant={isActive(item.path) ? 'default' : 'ghost'}
+                      className="gap-2"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (onProtectedRouteClick) {
+                          onProtectedRouteClick();
+                        }
+                      }}
+                    >
+                      <item.icon className="w-4 h-4" />
+                      {item.label}
+                    </Button>
+                  );
+                }
+                
+                return (
+                  <Link key={item.id} to={item.path}>
+                    <Button
+                      variant={isActive(item.path) ? 'default' : 'ghost'}
+                      className="gap-2"
+                    >
+                      <item.icon className="w-4 h-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -165,22 +189,45 @@ export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout }
 
                   {/* Navigation Items */}
                   <div className="space-y-2">
-                    {navItems.map(item => (
-                      <Link
-                        key={item.id}
-                        to={item.path}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="block"
-                      >
-                        <Button
-                          variant={isActive(item.path) ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3"
+                    {navItems.map(item => {
+                      const isProtected = !user && (item.path === '/questions' || item.path === '/practices' || item.path === '/hints' || item.path === '/pricing');
+                      
+                      if (isProtected) {
+                        return (
+                          <Button
+                            key={item.id}
+                            variant={isActive(item.path) ? 'default' : 'ghost'}
+                            className="w-full justify-start gap-3"
+                            onClick={() => {
+                              setMobileMenuOpen(false);
+                              if (onProtectedRouteClick) {
+                                onProtectedRouteClick();
+                              }
+                            }}
+                          >
+                            <item.icon className="w-5 h-5" />
+                            {item.label}
+                          </Button>
+                        );
+                      }
+                      
+                      return (
+                        <Link
+                          key={item.id}
+                          to={item.path}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block"
                         >
-                          <item.icon className="w-5 h-5" />
-                          {item.label}
-                        </Button>
-                      </Link>
-                    ))}
+                          <Button
+                            variant={isActive(item.path) ? 'default' : 'ghost'}
+                            className="w-full justify-start gap-3"
+                          >
+                            <item.icon className="w-5 h-5" />
+                            {item.label}
+                          </Button>
+                        </Link>
+                      );
+                    })}
                   </div>
 
                   {/* Logout Button */}

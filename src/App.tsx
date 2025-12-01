@@ -27,7 +27,7 @@ import { questions } from "./data/questions";
 import { codingChallenges } from "./data/challenges";
 import { Level, Language } from "./types";
 import { Toaster } from "./components/ui/sonner";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 
 type User = { email: string; name: string } | null;
 
@@ -86,11 +86,22 @@ export default function App() {
     if (authLoading) return; // Wait for auth to load
 
     if (user && location.pathname === "/") {
-      navigate("/dashboard", { replace: true });
+      // Check if user needs onboarding
+      const hasCompletedOnboarding =
+        (typeof window !== "undefined" &&
+          localStorage.getItem("onboardingCompleted") === "true") ||
+        (userPreferences.levels.length > 0 &&
+          userPreferences.languages.length > 0);
+
+      if (!hasCompletedOnboarding) {
+        setShowOnboarding(true);
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
     } else if (!user && location.pathname === "/dashboard") {
       navigate("/", { replace: true });
     }
-  }, [user, location.pathname, navigate, authLoading]);
+  }, [user, location.pathname, navigate, authLoading, userPreferences]);
 
   // Get current page from location pathname
   const currentPage =
@@ -104,8 +115,13 @@ export default function App() {
     // Save user preferences
     setUserPreferences({ levels, languages });
 
-    // Navigate to questions page
-    navigate("/questions");
+    // Mark onboarding as completed
+    if (typeof window !== "undefined") {
+      localStorage.setItem("onboardingCompleted", "true");
+    }
+
+    // Navigate to dashboard after onboarding
+    navigate("/dashboard");
     toast.success(
       "Preferences saved! Browse questions matching your selections."
     );
@@ -165,7 +181,17 @@ export default function App() {
   const handleAuthSuccess = (userData: { email: string; name: string }) => {
     // User is automatically set via useAuth hook when Firebase auth state changes
     toast.success(`Welcome ${userData.name}! 👋`);
-    navigate("/dashboard");
+
+    // Check if user has completed onboarding (has preferences saved)
+    const hasCompletedOnboarding =
+      userPreferences.levels.length > 0 && userPreferences.languages.length > 0;
+
+    if (!hasCompletedOnboarding) {
+      // Show onboarding modal after login
+      setShowOnboarding(true);
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   const handleLogout = async () => {
@@ -196,6 +222,7 @@ export default function App() {
         user={user}
         onLogin={handleLogin}
         onLogout={handleLogout}
+        onProtectedRouteClick={handleLoginRequired}
       />
 
       <Routes>
@@ -211,6 +238,7 @@ export default function App() {
                 onSelectQuestion={handleSelectQuestion}
                 onUnlock={handleUnlock}
                 hasUnlocked={progress.hasUnlocked}
+                onLoginRequired={handleLoginRequired}
               />
             )
           }
@@ -218,18 +246,69 @@ export default function App() {
         <Route
           path="/questions"
           element={
-            <QuestionLibrary
-              onSelectQuestion={handleSelectQuestion}
-              hasUnlocked={progress.hasUnlocked}
-              onUnlock={handleUnlock}
-              userPreferences={userPreferences}
-            />
+            user ? (
+              <QuestionLibrary
+                onSelectQuestion={handleSelectQuestion}
+                hasUnlocked={progress.hasUnlocked}
+                onUnlock={handleUnlock}
+                userPreferences={userPreferences}
+              />
+            ) : (
+              <ProtectedRoute
+                onLoginRequired={() => {
+                  setAuthMode("login");
+                  setShowAuth(true);
+                }}
+              />
+            )
           }
         />
-        <Route path="/questions/:id" element={<QuestionDetail />} />
+        <Route
+          path="/questions/:id"
+          element={
+            user ? (
+              <QuestionDetail />
+            ) : (
+              <ProtectedRoute
+                onLoginRequired={() => {
+                  setAuthMode("login");
+                  setShowAuth(true);
+                }}
+              />
+            )
+          }
+        />
         <Route path="/practice/:questionId" element={<PracticeModeWrapper />} />
-        <Route path="/practices" element={<PracticesList />} />
-        <Route path="/practices/:id" element={<PracticeDetail />} />
+        <Route
+          path="/practices"
+          element={
+            user ? (
+              <PracticesList />
+            ) : (
+              <ProtectedRoute
+                onLoginRequired={() => {
+                  setAuthMode("login");
+                  setShowAuth(true);
+                }}
+              />
+            )
+          }
+        />
+        <Route
+          path="/practices/:id"
+          element={
+            user ? (
+              <PracticeDetail />
+            ) : (
+              <ProtectedRoute
+                onLoginRequired={() => {
+                  setAuthMode("login");
+                  setShowAuth(true);
+                }}
+              />
+            )
+          }
+        />
         <Route
           path="/challenges"
           element={
@@ -240,7 +319,21 @@ export default function App() {
             />
           }
         />
-        <Route path="/hints" element={<HintsPage />} />
+        <Route
+          path="/hints"
+          element={
+            user ? (
+              <HintsPage />
+            ) : (
+              <ProtectedRoute
+                onLoginRequired={() => {
+                  setAuthMode("login");
+                  setShowAuth(true);
+                }}
+              />
+            )
+          }
+        />
         <Route
           path="/dashboard"
           element={
@@ -257,10 +350,19 @@ export default function App() {
         <Route
           path="/pricing"
           element={
-            <PricingPage
-              hasUnlocked={progress.hasUnlocked}
-              onUnlock={handleUnlock}
-            />
+            user ? (
+              <PricingPage
+                hasUnlocked={progress.hasUnlocked}
+                onUnlock={handleUnlock}
+              />
+            ) : (
+              <ProtectedRoute
+                onLoginRequired={() => {
+                  setAuthMode("login");
+                  setShowAuth(true);
+                }}
+              />
+            )
           }
         />
       </Routes>
@@ -301,6 +403,15 @@ export default function App() {
       <Toaster position="top-center" />
     </div>
   );
+}
+
+// Protected Route Component - shows login modal and redirects to home
+function ProtectedRoute({ onLoginRequired }: { onLoginRequired: () => void }) {
+  useEffect(() => {
+    onLoginRequired();
+  }, [onLoginRequired]);
+
+  return <Navigate to="/" replace />;
 }
 
 // Wrapper component for PracticeMode to handle URL params

@@ -1,10 +1,16 @@
-import { Lock, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
-import { Badge } from './ui/badge';
-import { Question } from '../types';
-import { useState } from 'react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import React, { useState } from "react";
+import { Lock, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Question } from "../types";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface HomePageProps {
   questions: Question[];
@@ -12,43 +18,58 @@ interface HomePageProps {
   onSelectQuestion: (questionId: string) => void;
   onUnlock: () => void;
   hasUnlocked: boolean;
+  onLoginRequired?: () => void;
 }
 
 const generalHints = [
   {
-    title: 'STAR Method',
-    description: 'Structure behavioral answers: Situation → Task → Action → Result',
-    color: 'bg-blue-50 border-blue-200'
+    title: "STAR Method",
+    description:
+      "Structure behavioral answers: Situation → Task → Action → Result",
+    color: "bg-blue-50 border-blue-200",
   },
   {
-    title: 'Ask Clarifying Questions',
-    description: 'Never assume. Always clarify requirements and edge cases before coding',
-    color: 'bg-purple-50 border-purple-200'
+    title: "Ask Clarifying Questions",
+    description:
+      "Never assume. Always clarify requirements and edge cases before coding",
+    color: "bg-purple-50 border-purple-200",
   },
   {
-    title: 'Whiteboard Tips',
-    description: 'Think out loud, start simple, test examples, iterate don\'t erase',
-    color: 'bg-green-50 border-green-200'
+    title: "Whiteboard Tips",
+    description:
+      "Think out loud, start simple, test examples, iterate don't erase",
+    color: "bg-green-50 border-green-200",
   },
   {
-    title: 'Time Complexity',
-    description: 'Always analyze and state Big O notation for your solutions',
-    color: 'bg-orange-50 border-orange-200'
-  }
+    title: "Time Complexity",
+    description: "Always analyze and state Big O notation for your solutions",
+    color: "bg-orange-50 border-orange-200",
+  },
 ];
 
-export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, hasUnlocked }: HomePageProps) {
+export function HomePage({
+  questions,
+  onStartFree,
+  onSelectQuestion,
+  onUnlock,
+  hasUnlocked,
+  onLoginRequired,
+}: HomePageProps) {
   const [currentHint, setCurrentHint] = useState(0);
-  
-  const freeQuestions = questions.filter(q => q.isFree).slice(0, 3);
-  const lockedQuestions = questions.filter(q => !q.isFree).slice(0, 3);
+
+  const freeQuestions = questions.filter((q) => q.isFree).slice(0, 3);
+  const lockedQuestions = questions.filter((q) => !q.isFree).slice(0, 3);
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'junior': return 'bg-green-100 text-green-700 border-green-300';
-      case 'mid': return 'bg-blue-100 text-blue-700 border-blue-300';
-      case 'senior': return 'bg-purple-100 text-purple-700 border-purple-300';
-      default: return 'bg-gray-100 text-gray-700 border-gray-300';
+      case "junior":
+        return "bg-green-100 text-green-700 border-green-300";
+      case "mid":
+        return "bg-blue-100 text-blue-700 border-blue-300";
+      case "senior":
+        return "bg-purple-100 text-purple-700 border-purple-300";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-300";
     }
   };
 
@@ -57,7 +78,9 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
   };
 
   const prevHint = () => {
-    setCurrentHint((prev) => (prev - 1 + generalHints.length) % generalHints.length);
+    setCurrentHint(
+      (prev) => (prev - 1 + generalHints.length) % generalHints.length
+    );
   };
 
   return (
@@ -69,17 +92,17 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
             <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
             <span>Your Path to Interview Success</span>
           </div>
-          
+
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent px-4">
             Ace Any Interview
             <br />
             Junior to Senior
           </h1>
-          
+
           <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-4 px-4">
             Master HTML, CSS, JavaScript, Python, React, Node.js, and more
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 px-4">
             <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-100 text-green-700 rounded-lg whitespace-nowrap">
               3 Free Questions
@@ -90,7 +113,17 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
             </span>
           </div>
 
-          <Button size="lg" onClick={onStartFree} className="gap-2">
+          <Button
+            size="lg"
+            onClick={() => {
+              if (onLoginRequired) {
+                onLoginRequired();
+              } else {
+                onStartFree();
+              }
+            }}
+            className="gap-2"
+          >
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             Start Free
           </Button>
@@ -109,10 +142,17 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
         <div className="mb-12 sm:mb-16">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
             <div>
-              <h2 className="text-2xl sm:text-3xl mb-1 sm:mb-2">Free Questions</h2>
-              <p className="text-sm sm:text-base text-gray-600">Start your journey with these complimentary questions</p>
+              <h2 className="text-2xl sm:text-3xl mb-1 sm:mb-2">
+                Free Questions
+              </h2>
+              <p className="text-sm sm:text-base text-gray-600">
+                Start your journey with these complimentary questions
+              </p>
             </div>
-            <Badge variant="secondary" className="bg-green-100 text-green-700 w-fit">
+            <Badge
+              variant="secondary"
+              className="bg-green-100 text-green-700 w-fit"
+            >
               FREE
             </Badge>
           </div>
@@ -122,14 +162,26 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
               <Card
                 key={question.id}
                 className="cursor-pointer hover:shadow-lg transition-shadow border-2"
-                onClick={() => onSelectQuestion(question.id)}
+                onClick={() => {
+                  if (onLoginRequired) {
+                    onLoginRequired();
+                  } else {
+                    onSelectQuestion(question.id);
+                  }
+                }}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <Badge className={getLevelColor(question.level)} variant="outline">
+                    <Badge
+                      className={getLevelColor(question.level)}
+                      variant="outline"
+                    >
                       {question.level}
                     </Badge>
-                    <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-700"
+                    >
                       FREE
                     </Badge>
                   </div>
@@ -142,7 +194,9 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Badge variant="outline">{question.difficulty}</Badge>
                     {question.company && (
-                      <span className="text-xs">Asked at {question.company}</span>
+                      <span className="text-xs">
+                        Asked at {question.company}
+                      </span>
                     )}
                   </div>
                 </CardContent>
@@ -155,11 +209,24 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
         <div className="mb-12 sm:mb-16">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
             <div>
-              <h2 className="text-2xl sm:text-3xl mb-1 sm:mb-2">Premium Questions</h2>
-              <p className="text-sm sm:text-base text-gray-600">Unlock 200+ questions for all levels with €2/month</p>
+              <h2 className="text-2xl sm:text-3xl mb-1 sm:mb-2">
+                Premium Questions
+              </h2>
+              <p className="text-sm sm:text-base text-gray-600">
+                Unlock 200+ questions for all levels with €2/month
+              </p>
             </div>
             {!hasUnlocked && (
-              <Button onClick={onUnlock} className="gap-2 w-fit">
+              <Button
+                onClick={() => {
+                  if (onLoginRequired) {
+                    onLoginRequired();
+                  } else {
+                    onUnlock();
+                  }
+                }}
+                className="gap-2 w-fit"
+              >
                 <Lock className="w-4 h-4" />
                 <span className="hidden sm:inline">€2/month</span>
                 <span className="sm:hidden">Unlock</span>
@@ -171,8 +238,16 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
             {lockedQuestions.map((question) => (
               <Card
                 key={question.id}
-                className={`relative ${!hasUnlocked ? 'opacity-75' : 'cursor-pointer hover:shadow-lg'} transition-shadow border-2`}
-                onClick={() => hasUnlocked && onSelectQuestion(question.id)}
+                className={`relative ${
+                  !hasUnlocked ? "opacity-75" : "cursor-pointer hover:shadow-lg"
+                } transition-shadow border-2`}
+                onClick={() => {
+                  if (onLoginRequired) {
+                    onLoginRequired();
+                  } else if (hasUnlocked) {
+                    onSelectQuestion(question.id);
+                  }
+                }}
               >
                 {!hasUnlocked && (
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
@@ -184,12 +259,13 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
                 )}
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <Badge className={getLevelColor(question.level)} variant="outline">
+                    <Badge
+                      className={getLevelColor(question.level)}
+                      variant="outline"
+                    >
                       {question.level}
                     </Badge>
-                    {!hasUnlocked && (
-                      <Lock className="w-4 h-4 text-gray-400" />
-                    )}
+                    {!hasUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
                   </div>
                   <CardTitle className="text-lg">{question.title}</CardTitle>
                   <CardDescription>
@@ -200,7 +276,9 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Badge variant="outline">{question.difficulty}</Badge>
                     {question.company && (
-                      <span className="text-xs">Asked at {question.company}</span>
+                      <span className="text-xs">
+                        Asked at {question.company}
+                      </span>
                     )}
                   </div>
                 </CardContent>
@@ -211,12 +289,16 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
 
         {/* Hints Carousel */}
         <div className="mb-12 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl mb-4 sm:mb-6 text-center">Free Interview Hints</h2>
-          
+          <h2 className="text-2xl sm:text-3xl mb-4 sm:mb-6 text-center">
+            Free Interview Hints
+          </h2>
+
           <div className="relative max-w-2xl mx-auto">
             <Card className={`${generalHints[currentHint].color} border-2`}>
               <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">{generalHints[currentHint].title}</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">
+                  {generalHints[currentHint].title}
+                </CardTitle>
                 <CardDescription className="text-gray-700 text-sm sm:text-base">
                   {generalHints[currentHint].description}
                 </CardDescription>
@@ -232,7 +314,7 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
                   <div
                     key={idx}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      idx === currentHint ? 'bg-blue-600' : 'bg-gray-300'
+                      idx === currentHint ? "bg-blue-600" : "bg-gray-300"
                     }`}
                   />
                 ))}
@@ -248,9 +330,20 @@ export function HomePage({ questions, onStartFree, onSelectQuestion, onUnlock, h
         <div className="text-center py-8 sm:py-10 md:py-12 px-4 sm:px-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl sm:rounded-2xl text-white">
           <h2 className="text-2xl sm:text-3xl mb-3 sm:mb-4">Ready to Start?</h2>
           <p className="text-base sm:text-lg md:text-xl mb-4 sm:mb-6 text-blue-100">
-            Try 3 questions free, then unlock all questions for all levels at €2/month
+            Try 3 questions free, then unlock all questions for all levels at
+            €2/month
           </p>
-          <Button size="lg" variant="secondary" onClick={onStartFree}>
+          <Button
+            size="lg"
+            variant="secondary"
+            onClick={() => {
+              if (onLoginRequired) {
+                onLoginRequired();
+              } else {
+                onStartFree();
+              }
+            }}
+          >
             Get Started Now
           </Button>
         </div>
