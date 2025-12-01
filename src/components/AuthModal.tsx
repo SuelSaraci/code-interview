@@ -1,12 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Mail, Lock, User, CheckCircle, AlertCircle } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Mail, Lock, User, CheckCircle, AlertCircle } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import { toast } from "sonner";
 
 // Google icon SVG component
 const GoogleIcon = () => (
@@ -34,24 +40,29 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAuthSuccess: (user: { email: string; name: string }) => void;
-  mode?: 'login' | 'signup';
+  mode?: "login" | "signup";
 }
 
-export function AuthModal({ isOpen, onClose, onAuthSuccess, mode = 'login' }: AuthModalProps) {
+export function AuthModal({
+  isOpen,
+  onClose,
+  onAuthSuccess,
+  mode = "login",
+}: AuthModalProps) {
   const { login, signup, loginWithGoogle } = useAuth();
   const [activeTab, setActiveTab] = useState(mode);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Login state
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
   // Signup state
-  const [signupName, setSignupName] = useState('');
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
 
   // Reset error when modal opens/closes or tab changes
   useEffect(() => {
@@ -62,23 +73,23 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, mode = 'login' }: Au
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     const result = await login(loginEmail, loginPassword);
-    
+
     if (result.success && result.user) {
       onAuthSuccess({
         email: result.user.email || loginEmail,
-        name: result.user.displayName || loginEmail.split('@')[0]
+        name: result.user.displayName || loginEmail.split("@")[0],
       });
       onClose();
-      setLoginEmail('');
-      setLoginPassword('');
-      toast.success('Successfully logged in!');
+      setLoginEmail("");
+      setLoginPassword("");
+      toast.success("Successfully logged in!");
     } else {
-      setError(result.error || 'Failed to login. Please try again.');
-      toast.error(result.error || 'Failed to login');
+      setError(result.error || "Failed to login. Please try again.");
+      toast.error(result.error || "Failed to login");
     }
-    
+
     setLoading(false);
   };
 
@@ -86,45 +97,48 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, mode = 'login' }: Au
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     const result = await signup(signupEmail, signupPassword, signupName);
-    
+
     if (result.success && result.user) {
       onAuthSuccess({
         email: result.user.email || signupEmail,
-        name: signupName
+        name: signupName,
       });
       onClose();
-      setSignupName('');
-      setSignupEmail('');
-      setSignupPassword('');
-      toast.success('Account created successfully!');
+      setSignupName("");
+      setSignupEmail("");
+      setSignupPassword("");
+      toast.success("Account created successfully!");
     } else {
-      setError(result.error || 'Failed to create account. Please try again.');
-      toast.error(result.error || 'Failed to create account');
+      setError(result.error || "Failed to create account. Please try again.");
+      toast.error(result.error || "Failed to create account");
     }
-    
+
     setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     setError(null);
-    
+
     const result = await loginWithGoogle();
-    
+
     if (result.success && result.user) {
       onAuthSuccess({
-        email: result.user.email || '',
-        name: result.user.displayName || result.user.email?.split('@')[0] || 'User'
+        email: result.user.email || "",
+        name:
+          result.user.displayName || result.user.email?.split("@")[0] || "User",
       });
       onClose();
-      toast.success('Successfully signed in with Google!');
+      toast.success("Successfully signed in with Google!");
     } else {
-      setError(result.error || 'Failed to sign in with Google. Please try again.');
-      toast.error(result.error || 'Failed to sign in with Google');
+      setError(
+        result.error || "Failed to sign in with Google. Please try again."
+      );
+      toast.error(result.error || "Failed to sign in with Google");
     }
-    
+
     setGoogleLoading(false);
   };
 
@@ -132,13 +146,18 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, mode = 'login' }: Au
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Welcome to InterviewPrep</DialogTitle>
+          <DialogTitle className="text-2xl">
+            Welcome to InterviewPrep
+          </DialogTitle>
           <DialogDescription>
             Sign in to unlock premium features and track your progress
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'login' | 'signup')}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as "login" | "signup")}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -172,7 +191,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, mode = 'login' }: Au
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with email</span>
+              <span className="bg-white px-2 text-gray-500">
+                Or continue with email
+              </span>
             </div>
           </div>
 
@@ -222,9 +243,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, mode = 'login' }: Au
                   <input type="checkbox" className="rounded" />
                   <span className="text-gray-600">Remember me</span>
                 </label>
-                <a href="#" className="text-blue-600 hover:underline">
+                {/* <a href="#" className="text-blue-600 hover:underline">
                   Forgot password?
-                </a>
+                </a> */}
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
@@ -234,7 +255,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, mode = 'login' }: Au
                     Logging in...
                   </>
                 ) : (
-                  'Login'
+                  "Login"
                 )}
               </Button>
             </form>
