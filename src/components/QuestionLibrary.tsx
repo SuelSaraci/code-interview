@@ -396,7 +396,7 @@ export function QuestionLibrary({
                   >
                     <Lock className="w-4 h-4" />
                     <span className="hidden sm:inline">
-                      Unlock {lockedCount} Questions
+                      Unlock All Premium Questions
                     </span>
                     <span className="sm:hidden">Unlock Premium</span>
                   </Button>
