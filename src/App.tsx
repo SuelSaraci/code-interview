@@ -5,11 +5,15 @@ import {
   useNavigate,
   useParams,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
 import { HomePage } from "./components/HomePage";
 import { QuestionLibrary } from "./components/QuestionLibrary";
+import { QuestionDetail } from "./components/QuestionDetail";
 import { PracticeMode } from "./components/PracticeMode";
+import { PracticesList } from "./components/PracticesList";
+import { PracticeDetail } from "./components/PracticeDetail";
 import { CodingChallenges } from "./components/CodingChallenges";
 import { HintsPage } from "./components/HintsPage";
 import { Dashboard } from "./components/Dashboard";
@@ -76,6 +80,17 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("userPreferences", JSON.stringify(userPreferences));
   }, [userPreferences]);
+
+  // Redirect logic: logged in users from "/" to "/dashboard", non-logged in users from "/dashboard" to "/"
+  useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+
+    if (user && location.pathname === "/") {
+      navigate("/dashboard", { replace: true });
+    } else if (!user && location.pathname === "/dashboard") {
+      navigate("/", { replace: true });
+    }
+  }, [user, location.pathname, navigate, authLoading]);
 
   // Get current page from location pathname
   const currentPage =
@@ -150,12 +165,14 @@ export default function App() {
   const handleAuthSuccess = (userData: { email: string; name: string }) => {
     // User is automatically set via useAuth hook when Firebase auth state changes
     toast.success(`Welcome ${userData.name}! 👋`);
+    navigate("/dashboard");
   };
 
   const handleLogout = async () => {
     const result = await firebaseLogout();
     if (result.success) {
       toast.info("Logged out successfully");
+      navigate("/");
     } else {
       toast.error(result.error || "Failed to logout");
     }
@@ -185,20 +202,23 @@ export default function App() {
         <Route
           path="/"
           element={
-            <HomePage
-              questions={questions}
-              onStartFree={handleStartFree}
-              onSelectQuestion={handleSelectQuestion}
-              onUnlock={handleUnlock}
-              hasUnlocked={progress.hasUnlocked}
-            />
+            user ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <HomePage
+                questions={questions}
+                onStartFree={handleStartFree}
+                onSelectQuestion={handleSelectQuestion}
+                onUnlock={handleUnlock}
+                hasUnlocked={progress.hasUnlocked}
+              />
+            )
           }
         />
         <Route
           path="/questions"
           element={
             <QuestionLibrary
-              questions={questions}
               onSelectQuestion={handleSelectQuestion}
               hasUnlocked={progress.hasUnlocked}
               onUnlock={handleUnlock}
@@ -206,7 +226,10 @@ export default function App() {
             />
           }
         />
+        <Route path="/questions/:id" element={<QuestionDetail />} />
         <Route path="/practice/:questionId" element={<PracticeModeWrapper />} />
+        <Route path="/practices" element={<PracticesList />} />
+        <Route path="/practices/:id" element={<PracticeDetail />} />
         <Route
           path="/challenges"
           element={
@@ -221,12 +244,14 @@ export default function App() {
         <Route
           path="/dashboard"
           element={
-            <Dashboard
-              completedQuestions={progress.questionsCompleted}
-              questions={questions}
-              onSelectQuestion={handleSelectQuestion}
-              hasUnlocked={progress.hasUnlocked}
-            />
+            user ? (
+              <Dashboard
+                onSelectQuestion={handleSelectQuestion}
+                hasUnlocked={progress.hasUnlocked}
+              />
+            ) : (
+              <Navigate to="/" replace />
+            )
           }
         />
         <Route

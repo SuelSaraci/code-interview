@@ -1,7 +1,7 @@
 import axios, { AxiosRequestHeaders } from "axios";
 
 // const BASE_URL = "https://asphyxial-unrefreshed-brodie.ngrok-free.dev";
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = "http://localhost:5001";
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,

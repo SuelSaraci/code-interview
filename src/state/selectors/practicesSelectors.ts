@@ -8,6 +8,7 @@ import type {
   GetPracticesResponse,
   PracticeDetail,
 } from "../../services/types";
+import { practicesRefreshKeyState } from "../atoms/practicesAtoms";
 
 export const practicesQuerySelector = selectorFamily<
   GetPracticesResponse | null,
@@ -16,21 +17,32 @@ export const practicesQuerySelector = selectorFamily<
   key: "practicesQuerySelector",
   get:
     (params) =>
-    async () => {
+    async ({ get }) => {
       if (!params.enabled) {
         return null;
       }
+      // Depend on global refresh key so refetches occur when it changes
+      get(practicesRefreshKeyState);
       const res = await getPractices(params.query);
       return res;
     },
 });
 
-export const practiceByIdSelector = selectorFamily<PracticeDetail | null, number>({
+// Fetch a single practice by id, but only when explicitly enabled.
+export const practiceByIdSelector = selectorFamily<
+  PracticeDetail | null,
+  { id: number; enabled: boolean }
+>({
   key: "practiceByIdSelector",
-  get: (id: number) => async () => {
-    const res = await getPracticeById(id);
-    return res.practice;
-  },
+  get:
+    (params) =>
+    async () => {
+      if (!params.enabled || !params.id) {
+        return null;
+      }
+      const res = await getPracticeById(params.id);
+      return res.practice;
+    },
 });
 
 

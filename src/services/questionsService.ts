@@ -3,6 +3,9 @@ import type {
   GetQuestionByIdResponse,
   GetQuestionsQuery,
   GetQuestionsResponse,
+  SubmitQuestionAnswerRequest,
+  SubmitQuestionAnswerResponse,
+  ResetAttemptsResponse,
 } from "./types";
 
 export async function getQuestions(query?: GetQuestionsQuery) {
@@ -23,4 +26,26 @@ export async function getQuestionById(id: number) {
   return res.data;
 }
 
+export async function submitQuestionAnswer(
+  id: number,
+  body: SubmitQuestionAnswerRequest,
+) {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.post<SubmitQuestionAnswerResponse>(
+    `/api/questions/${id}/submit`,
+    body,
+    { headers },
+  );
+  return res.data;
+}
+
+export async function resetQuestionAttempts() {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.post<ResetAttemptsResponse>(
+    "/api/questions/reset/all",
+    {},
+    { headers },
+  );
+  return res.data;
+}
 

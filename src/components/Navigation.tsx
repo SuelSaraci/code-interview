@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Code2, Home, BookOpen, Lightbulb, CreditCard, User, LogOut, Menu, X, Code } from 'lucide-react';
+import { Code2, Home, BookOpen, Lightbulb, CreditCard, User, LogOut, Menu, X, LayoutDashboard, ClipboardList } from 'lucide-react';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
 
@@ -16,10 +16,14 @@ export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout }
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Conditionally build nav items based on login status
   const navItems = [
-    { id: 'home', path: '/', label: 'Home', icon: Home },
+    // Show Dashboard if logged in, Home if not logged in
+    user 
+      ? { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard }
+      : { id: 'home', path: '/', label: 'Home', icon: Home },
     { id: 'questions', path: '/questions', label: 'Questions', icon: BookOpen },
-    { id: 'challenges', path: '/challenges', label: 'Practice', icon: Code },
+    { id: 'practices', path: '/practices', label: 'Practices', icon: ClipboardList },
     { id: 'hints', path: '/hints', label: 'Hints', icon: Lightbulb },
     { id: 'pricing', path: '/pricing', label: 'Pricing', icon: CreditCard },
   ];
@@ -27,6 +31,15 @@ export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout }
   const isActive = (path: string) => {
     if (path === '/') {
       return location.pathname === '/';
+    }
+    if (path === '/dashboard') {
+      return location.pathname === '/dashboard';
+    }
+    if (path === '/practices') {
+      return location.pathname.startsWith('/practices');
+    }
+    if (path === '/questions') {
+      return location.pathname.startsWith('/questions');
     }
     return location.pathname.startsWith(path);
   };
@@ -168,22 +181,6 @@ export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout }
                         </Button>
                       </Link>
                     ))}
-                    
-                    {user && (
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="block"
-                      >
-                        <Button
-                          variant={isActive('/dashboard') ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3"
-                        >
-                          <User className="w-5 h-5" />
-                          Dashboard
-                        </Button>
-                      </Link>
-                    )}
                   </div>
 
                   {/* Logout Button */}

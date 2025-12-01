@@ -5,6 +5,7 @@ import type {
   GetPracticeByIdResponse,
   SubmitPracticeAnswerRequest,
   SubmitPracticeAnswerResponse,
+  ResetAttemptsResponse,
 } from "./types";
 
 export async function getPractices(query?: GetPracticesQuery) {
@@ -34,6 +35,16 @@ export async function submitPracticeAnswer(
     `/api/practices/${id}/submit`,
     body,
     { headers }
+  );
+  return res.data;
+}
+
+export async function resetPracticeAttempts() {
+  const headers = await getAuthHeaders();
+  const res = await axiosInstance.post<ResetAttemptsResponse>(
+    "/api/practices/reset/all",
+    {},
+    { headers },
   );
   return res.data;
 }

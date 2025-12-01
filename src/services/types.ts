@@ -35,10 +35,17 @@ export interface Question {
   level: QuestionLevel;
   duration: number;
   source: string | null;
+  options: string[];
+  correct_answer?: number;
+  showAnswer?: boolean;
   is_premium: boolean;
   created_at: string;
   updated_at: string;
   attempted?: boolean;
+  isCorrect?: boolean | null;
+  explanation?: string | null;
+  userSelectedAnswer?: number | null;
+  userIsCorrect?: boolean | null;
 }
 
 export interface GetQuestionsQuery {
@@ -57,6 +64,23 @@ export interface GetQuestionsResponse {
 export interface GetQuestionByIdResponse {
   success: true;
   question: Question;
+}
+
+// Questions: submit multiple-choice answer (mirrors practices shape)
+export interface SubmitQuestionAnswerRequest {
+  selectedAnswer: number;
+}
+
+export interface SubmitQuestionAnswerResponse {
+  success: true;
+  isCorrect: boolean;
+  correctAnswer: number;
+  explanation?: string | null;
+}
+
+export interface ResetAttemptsResponse {
+  success: true;
+  deletedAttempts: number;
 }
 
 // Practices
@@ -94,6 +118,8 @@ export interface GetPracticesResponse {
 
 export interface PracticeDetail extends Practice {
   showAnswer: boolean;
+  userSelectedAnswer?: number | null;
+  userIsCorrect?: boolean | null;
 }
 
 export interface GetPracticeByIdResponse {
@@ -109,7 +135,7 @@ export interface SubmitPracticeAnswerResponse {
   success: true;
   isCorrect: boolean;
   correctAnswer: number;
-  explanation: string | null;
+  explanation?: string | null;
 }
 
 // Subscriptions
@@ -196,5 +222,3 @@ export interface GetDashboardResponse {
   success: true;
   dashboard: DashboardData;
 }
-
-

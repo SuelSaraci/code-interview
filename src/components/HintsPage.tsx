@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
@@ -7,6 +8,7 @@ import { hints } from '../data/hints';
 import { Hint } from '../types';
 
 export function HintsPage() {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<Hint['category']>('Behavioral');
 
   const categories: Hint['category'][] = ['Behavioral', 'Technical Mindset', 'Negotiation', 'Remote Etiquette'];
@@ -82,8 +84,12 @@ export function HintsPage() {
             <p className="text-base sm:text-lg md:text-xl mb-4 sm:mb-6 text-purple-100">
               Apply these tips with our interview questions
             </p>
-            <Button size="lg" variant="secondary">
-              Browse Questions
+            <Button
+              size="lg"
+              variant="secondary"
+              onClick={() => navigate("/practices")}
+            >
+              Browse Practices
             </Button>
           </CardContent>
         </Card>
