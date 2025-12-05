@@ -12,7 +12,7 @@ import { Badge } from "./ui/badge";
 import { ArrowLeft, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { questionByIdSelector } from "../state/selectors/questionsSelectors";
 import { useAuth } from "../hooks/useAuth";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { submitQuestionAnswer } from "../services/questionsService";
 import { toast } from "sonner";
@@ -284,15 +284,7 @@ export function QuestionDetail() {
                   <Label className="text-sm mb-2 block">
                     Select the best answer:
                   </Label>
-                  <RadioGroup
-                    value={
-                      selectedOption !== null ? selectedOption.toString() : ""
-                    }
-                    onValueChange={(value) =>
-                      setSelectedOption(parseInt(value, 10))
-                    }
-                    disabled={submitted || submitLoading}
-                  >
+                  <div className="space-y-2">
                     {question.options.map((option, index) => {
                       const isSelected = selectedOption === index;
                       const effectiveCorrect =
@@ -306,10 +298,21 @@ export function QuestionDetail() {
                       const userWasCorrect =
                         question.userIsCorrect ?? isCorrect;
 
+                      const handleOptionClick = (e: React.MouseEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!submitted && !submitLoading) {
+                          // Single-select behavior: set to this index if not selected, or null if already selected
+                          setSelectedOption(isSelected ? null : index);
+                        }
+                      };
+
                       return (
                         <div
                           key={index}
-                          className={`flex items-start space-x-3 p-4 rounded-lg border transition-colors mb-2 ${
+                          role="button"
+                          tabIndex={submitted || submitLoading ? -1 : 0}
+                          className={`flex items-start space-x-3 p-4 rounded-lg border transition-colors cursor-pointer ${
                             showAnswer && isCorrectAnswer
                               ? "bg-green-50 border-green-300"
                               : showAnswer && isUserAnswer && !userWasCorrect
@@ -317,18 +320,25 @@ export function QuestionDetail() {
                               : isSelected
                               ? "bg-blue-50 border-blue-300"
                               : "bg-white border-gray-200 hover:border-gray-300"
-                          }`}
+                          } ${submitted || submitLoading ? "opacity-60 cursor-not-allowed" : ""}`}
+                          onClick={handleOptionClick}
+                          onKeyDown={(e) => {
+                            if ((e.key === "Enter" || e.key === " ") && !submitted && !submitLoading) {
+                              e.preventDefault();
+                              setSelectedOption(isSelected ? null : index);
+                            }
+                          }}
                         >
-                          <RadioGroupItem
-                            value={index.toString()}
-                            id={`option-${index}`}
-                            disabled={submitted || submitLoading}
-                            className="mt-1"
-                          />
-                          <Label
-                            htmlFor={`option-${index}`}
-                            className="flex-1 cursor-pointer"
-                          >
+                          <div className="mt-1 flex-shrink-0">
+                            <Checkbox
+                              id={`option-${index}`}
+                              checked={isSelected}
+                              disabled={submitted || submitLoading}
+                              readOnly
+                              className="pointer-events-none"
+                            />
+                          </div>
+                          <div className="flex-1 cursor-pointer">
                             <div className="flex items-center gap-2 text-sm">
                               <span>{option}</span>
                               {showAnswer && isCorrectAnswer && (
@@ -340,11 +350,11 @@ export function QuestionDetail() {
                                   <XCircle className="w-4 h-4 text-red-600" />
                                 )}
                             </div>
-                          </Label>
+                          </div>
                         </div>
                       );
                     })}
-                  </RadioGroup>
+                  </div>
                 </div>
 
                 {(submitted || question.showAnswer) && question.explanation && (

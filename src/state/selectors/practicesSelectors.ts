@@ -36,10 +36,12 @@ export const practiceByIdSelector = selectorFamily<
   key: "practiceByIdSelector",
   get:
     (params) =>
-    async () => {
+    async ({ get }) => {
       if (!params.enabled || !params.id) {
         return null;
       }
+      // Depend on global refresh key so refetches occur when it changes
+      get(practicesRefreshKeyState);
       const res = await getPracticeById(params.id);
       return res.practice;
     },

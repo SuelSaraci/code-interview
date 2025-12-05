@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useRecoilValueLoadable, useSetRecoilState } from "recoil";
+import { useRecoilValueLoadable, useSetRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
 import { Search, Lock, Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "./ui/button";
@@ -40,6 +40,8 @@ export function PracticesList() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
   const [resetLoading, setResetLoading] = useState(false);
   const setPracticesRefreshKey = useSetRecoilState(practicesRefreshKeyState);
+  // Subscribe to refresh key changes to ensure component re-renders when it updates
+  const practicesRefreshKey = useRecoilValue(practicesRefreshKeyState);
 
   // Always call hooks in the same order – enable flag controls whether API is used
   const practicesLoadable = useRecoilValueLoadable(

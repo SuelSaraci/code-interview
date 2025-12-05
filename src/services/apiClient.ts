@@ -1,4 +1,4 @@
-import axios, { AxiosRequestHeaders } from "axios";
+import axios, { AxiosRequestHeaders, AxiosError, InternalAxiosRequestConfig } from "axios";
 
 // const BASE_URL = "https://asphyxial-unrefreshed-brodie.ngrok-free.dev";
 const BASE_URL = "http://localhost:5001";
@@ -10,15 +10,16 @@ export const axiosInstance = axios.create({
   },
 });
 
-async function getIdToken(): Promise<string | null> {
+async function getIdToken(forceRefresh: boolean = false): Promise<string | null> {
   const { auth } = await import("../lib/firebase");
   const user = auth.currentUser;
   if (!user) return null;
-  return await user.getIdToken();
+  // Force refresh if requested, otherwise get cached token (Firebase auto-refreshes when needed)
+  return await user.getIdToken(forceRefresh);
 }
 
-export async function getAuthHeaders(): Promise<AxiosRequestHeaders> {
-  const token = await getIdToken();
+export async function getAuthHeaders(forceRefresh: boolean = false): Promise<AxiosRequestHeaders> {
+  const token = await getIdToken(forceRefresh);
   const headers = {} as AxiosRequestHeaders;
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -34,7 +35,7 @@ export async function getAuthHeaders(): Promise<AxiosRequestHeaders> {
 
 // Attach Firebase ID token to every request if available
 axiosInstance.interceptors.request.use(async (config) => {
-  const token = await getIdToken();
+  const token = await getIdToken(false);
   if (token) {
     if (!config.headers) {
       config.headers = {} as AxiosRequestHeaders;
@@ -43,3 +44,52 @@ axiosInstance.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+// Handle token expiration - retry with fresh token on 401 errors
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    // Check if error is due to expired/invalid token
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      error.response?.data &&
+      typeof error.response.data === 'object' &&
+      'error' in error.response.data &&
+      (error.response.data.error === "Invalid or expired token" ||
+       error.response.data.error === "Unauthorized" ||
+       error.response.data.message === "Invalid or expired token")
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        // Force refresh the token
+        const { auth } = await import("../lib/firebase");
+        const user = auth.currentUser;
+        
+        if (user) {
+          // Get a fresh token
+          const newToken = await user.getIdToken(true);
+          
+          if (newToken && originalRequest.headers) {
+            // Update the authorization header with the new token
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            
+            // Retry the original request with the new token
+            return axiosInstance(originalRequest);
+          }
+        }
+      } catch (refreshError) {
+        // If token refresh fails, redirect to login or handle appropriately
+        console.error("[apiClient] Failed to refresh token:", refreshError);
+        // You might want to dispatch a logout action here
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);

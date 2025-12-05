@@ -1,4 +1,6 @@
+import React from "react";
 import { useRecoilValueLoadable } from "recoil";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -28,7 +30,20 @@ interface DashboardProps {
 
 export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const dashboardLoadable = useRecoilValueLoadable(dashboardSelector(!!user));
+
+  const handleItemClick = (item: {
+    id: number;
+    type?: "question" | "practice";
+  }) => {
+    if (item.type === "practice") {
+      navigate(`/practices/${item.id}`);
+    } else {
+      // Default to question if type is not specified or is "question"
+      navigate(`/questions/${item.id}`);
+    }
+  };
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -76,6 +91,7 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
   const {
     totals = {
       completedQuestions: 0,
+      completedPractices: 0,
       freeQuestionsUsed: 0,
       freeQuestionLimit: 3,
     },
@@ -117,9 +133,15 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl sm:text-3xl">
-                {totals.completedQuestions}
+                {totals.completedQuestions + (totals.completedPractices || 0)}
               </div>
-              <p className="text-xs text-gray-600 mt-1">questions completed</p>
+              <p className="text-xs text-gray-600 mt-1">
+                {totals.completedQuestions > 0 && totals.completedPractices
+                  ? `${totals.completedQuestions} questions, ${totals.completedPractices} practices`
+                  : totals.completedPractices
+                  ? `${totals.completedPractices} practices completed`
+                  : "questions and practices completed"}
+              </p>
             </CardContent>
           </Card>
 
@@ -153,7 +175,7 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
             </CardContent>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-xs sm:text-sm">Avg. Time</CardTitle>
               <Clock className="w-4 h-4 text-blue-600 flex-shrink-0" />
@@ -164,7 +186,7 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
               </div>
               <p className="text-xs text-gray-600 mt-1">per question</p>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
@@ -176,7 +198,7 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
                 Progress by Level
               </CardTitle>
               <CardDescription>
-                See how you're doing at each level
+                Completed correct questions / total questions by level
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -195,7 +217,8 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
                           : "Senior"}
                       </Badge>
                       <span className="text-sm text-gray-600">
-                        {levelProgress.completed}/{levelProgress.total}
+                        {levelProgress.completed} / {levelProgress.total}{" "}
+                        correct
                       </span>
                     </div>
                     <span className="text-sm">{levelProgress.percentage}%</span>
@@ -242,7 +265,9 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
                 <Clock className="w-5 h-5" />
                 Recent Activity
               </CardTitle>
-              <CardDescription>Your last completed questions</CardDescription>
+              <CardDescription>
+                Your last completed questions and practices
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {recentActivity.length > 0 ? (
@@ -251,13 +276,22 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
                     <div
                       key={activity.id}
                       className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
-                      onClick={() => onSelectQuestion(activity.id.toString())}
+                      onClick={() => handleItemClick(activity)}
                     >
                       <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                         <BookOpen className="w-4 h-4 text-green-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm truncate">{activity.title}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm truncate">{activity.title}</p>
+                          {activity.type && (
+                            <Badge variant="outline" className="text-xs">
+                              {activity.type === "practice"
+                                ? "Practice"
+                                : "Question"}
+                            </Badge>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge
                             className={`${getLevelColor(
@@ -277,7 +311,7 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
                 </div>
               ) : (
                 <p className="text-sm text-gray-600 text-center py-8">
-                  No completed questions yet. Start practicing!
+                  No completed questions or practices yet. Start practicing!
                 </p>
               )}
             </CardContent>
@@ -290,7 +324,9 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
                 <Target className="w-5 h-5" />
                 Recommended Next
               </CardTitle>
-              <CardDescription>Questions to try next</CardDescription>
+              <CardDescription>
+                Questions and practices to try next
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {recommendedNext.length > 0 ? (
@@ -299,13 +335,22 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
                     <div
                       key={question.id}
                       className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
-                      onClick={() => onSelectQuestion(question.id.toString())}
+                      onClick={() => handleItemClick(question)}
                     >
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                         <BookOpen className="w-4 h-4 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm truncate">{question.title}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm truncate">{question.title}</p>
+                          {question.type && (
+                            <Badge variant="outline" className="text-xs">
+                              {question.type === "practice"
+                                ? "Practice"
+                                : "Question"}
+                            </Badge>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge
                             className={`${getLevelColor(
@@ -327,7 +372,7 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
                 <div className="text-center py-8">
                   <p className="text-sm text-gray-600 mb-4">
                     {hasUnlocked
-                      ? "You've completed all available questions!"
+                      ? "You've completed all available questions and practices!"
                       : "Unlock premium to see more recommendations"}
                   </p>
                   {!hasUnlocked && <Button size="sm">Unlock Premium</Button>}

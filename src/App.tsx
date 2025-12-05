@@ -216,6 +216,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white">
+      <ScrollToTop />
       <Navigation
         currentPage={currentPage}
         hasUnlocked={progress.hasUnlocked}
@@ -246,7 +247,9 @@ export default function App() {
         <Route
           path="/questions"
           element={
-            user ? (
+            authLoading ? (
+              <AuthLoadingState />
+            ) : user ? (
               <QuestionLibrary
                 onSelectQuestion={handleSelectQuestion}
                 hasUnlocked={progress.hasUnlocked}
@@ -259,6 +262,7 @@ export default function App() {
                   setAuthMode("login");
                   setShowAuth(true);
                 }}
+                authLoading={authLoading}
               />
             )
           }
@@ -266,7 +270,9 @@ export default function App() {
         <Route
           path="/questions/:id"
           element={
-            user ? (
+            authLoading ? (
+              <AuthLoadingState />
+            ) : user ? (
               <QuestionDetail />
             ) : (
               <ProtectedRoute
@@ -274,6 +280,7 @@ export default function App() {
                   setAuthMode("login");
                   setShowAuth(true);
                 }}
+                authLoading={authLoading}
               />
             )
           }
@@ -282,7 +289,9 @@ export default function App() {
         <Route
           path="/practices"
           element={
-            user ? (
+            authLoading ? (
+              <AuthLoadingState />
+            ) : user ? (
               <PracticesList />
             ) : (
               <ProtectedRoute
@@ -290,6 +299,7 @@ export default function App() {
                   setAuthMode("login");
                   setShowAuth(true);
                 }}
+                authLoading={authLoading}
               />
             )
           }
@@ -297,7 +307,9 @@ export default function App() {
         <Route
           path="/practices/:id"
           element={
-            user ? (
+            authLoading ? (
+              <AuthLoadingState />
+            ) : user ? (
               <PracticeDetail />
             ) : (
               <ProtectedRoute
@@ -305,6 +317,7 @@ export default function App() {
                   setAuthMode("login");
                   setShowAuth(true);
                 }}
+                authLoading={authLoading}
               />
             )
           }
@@ -322,7 +335,9 @@ export default function App() {
         <Route
           path="/hints"
           element={
-            user ? (
+            authLoading ? (
+              <AuthLoadingState />
+            ) : user ? (
               <HintsPage />
             ) : (
               <ProtectedRoute
@@ -330,6 +345,7 @@ export default function App() {
                   setAuthMode("login");
                   setShowAuth(true);
                 }}
+                authLoading={authLoading}
               />
             )
           }
@@ -350,7 +366,9 @@ export default function App() {
         <Route
           path="/pricing"
           element={
-            user ? (
+            authLoading ? (
+              <AuthLoadingState />
+            ) : user ? (
               <PricingPage
                 hasUnlocked={progress.hasUnlocked}
                 onUnlock={handleUnlock}
@@ -361,6 +379,7 @@ export default function App() {
                   setAuthMode("login");
                   setShowAuth(true);
                 }}
+                authLoading={authLoading}
               />
             )
           }
@@ -405,11 +424,48 @@ export default function App() {
   );
 }
 
-// Protected Route Component - shows login modal and redirects to home
-function ProtectedRoute({ onLoginRequired }: { onLoginRequired: () => void }) {
+// Scroll to top component - resets scroll position on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
   useEffect(() => {
-    onLoginRequired();
-  }, [onLoginRequired]);
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
+// Loading component for auth check
+function AuthLoadingState() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-600">Checking authentication...</p>
+      </div>
+    </div>
+  );
+}
+
+// Protected Route Component - shows login modal and redirects to home
+function ProtectedRoute({ 
+  onLoginRequired,
+  authLoading 
+}: { 
+  onLoginRequired: () => void;
+  authLoading: boolean;
+}) {
+  useEffect(() => {
+    // Only show login modal if auth has finished loading and user is not logged in
+    if (!authLoading) {
+      onLoginRequired();
+    }
+  }, [onLoginRequired, authLoading]);
+
+  // Show loading state while auth is being checked
+  if (authLoading) {
+    return <AuthLoadingState />;
+  }
 
   return <Navigate to="/" replace />;
 }

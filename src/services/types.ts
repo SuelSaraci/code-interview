@@ -167,6 +167,7 @@ export interface GetSubscriptionStatusResponse {
 // Dashboard
 export interface DashboardTotals {
   completedQuestions: number;
+  completedPractices?: number; // Optional: completed practices count
   freeQuestionsUsed: number;
   freeQuestionLimit: number;
 }
@@ -181,8 +182,8 @@ export interface DashboardTiming {
 
 export interface LevelProgress {
   level: QuestionLevel;
-  completed: number;
-  total: number;
+  completed: number; // completed correct questions
+  total: number; // total questions by level
   percentage: number;
 }
 
@@ -198,6 +199,7 @@ export interface RecentQuestionActivity {
   level: QuestionLevel;
   difficulty: QuestionDifficulty;
   attemptedAt: string;
+  type?: "question" | "practice"; // Optional field to distinguish type
 }
 
 export interface RecommendedQuestion {
@@ -206,6 +208,7 @@ export interface RecommendedQuestion {
   language: string;
   level: QuestionLevel;
   difficulty: QuestionDifficulty;
+  type?: "question" | "practice"; // Optional field to distinguish type
 }
 
 export interface DashboardData {
