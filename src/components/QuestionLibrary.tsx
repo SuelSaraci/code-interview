@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValueLoadable, useSetRecoilState } from "recoil";
+import { PageMeta } from "./PageMeta";
 import {
   Search,
   Filter,
@@ -56,12 +57,23 @@ import { toast } from "sonner";
 import { OnboardingModal } from "./OnboardingModal";
 import type { QuestionLevel } from "../services/types";
 import { questionsRefreshKeyState } from "../state/atoms/questionsAtoms";
+import type { Question } from "../services/types";
 
 const FILTERS_STORAGE_KEY = "question_library_filters_v1";
+
+interface LockedCard {
+  id: string;
+  isLocked: true;
+  level: QuestionLevel;
+  language: string;
+}
+
+type QuestionOrLocked = Question | LockedCard;
 
 interface QuestionLibraryProps {
   onSelectQuestion: (questionId: string) => void;
   hasUnlocked: boolean;
+  hasPremium?: boolean;
   onUnlock: () => void;
   userPreferences?: { levels: Level[]; languages: Language[] };
 }
@@ -69,6 +81,7 @@ interface QuestionLibraryProps {
 export function QuestionLibrary({
   onSelectQuestion,
   hasUnlocked,
+  hasPremium,
   onUnlock,
   userPreferences,
 }: QuestionLibraryProps) {
@@ -135,6 +148,8 @@ export function QuestionLibrary({
   const questionsData =
     questionsLoadable.state === "hasValue" ? questionsLoadable.contents : null;
   const questions = questionsData?.questions || [];
+  // Use prop if provided, otherwise fall back to data from API
+  const hasPremiumStatus = hasPremium ?? questionsData?.hasPremium ?? false;
 
   // All hooks must be called unconditionally before any returns
   // Languages that exist in questions plus any custom languages from onboarding
@@ -164,6 +179,34 @@ export function QuestionLibrary({
     return filtered;
   }, [questions, searchQuery, selectedLevels, selectedLanguages]);
 
+  // Create dummy locked cards when hasPremium is false
+  const lockedCards = useMemo((): LockedCard[] => {
+    if (hasPremiumStatus) return [];
+
+    // Create enough locked cards to fill the grid (at least 9-12 cards)
+    // We'll create cards with different levels and languages for variety
+    const levels: QuestionLevel[] = ["junior", "mid", "senior"];
+    const languages = [
+      "JavaScript",
+      "Python",
+      "React",
+      "Node.js",
+      "TypeScript",
+      "Java",
+      "SQL",
+      "Ruby",
+      "HTML",
+      "CSS",
+    ];
+
+    return Array.from({ length: 30 }, (_, i) => ({
+      id: `locked-${i}`,
+      isLocked: true as const,
+      level: levels[i % levels.length] as QuestionLevel,
+      language: languages[i % languages.length],
+    }));
+  }, [hasPremiumStatus]);
+
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
@@ -188,11 +231,20 @@ export function QuestionLibrary({
     }
   }, [selectedLevels, selectedLanguages, customLanguages]);
 
-  const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
+  // Combine filtered questions with locked cards when hasPremium is false
+  const allQuestionsWithLocked = useMemo((): QuestionOrLocked[] => {
+    if (hasPremiumStatus) {
+      return filteredQuestions;
+    }
+    // When hasPremium is false, show free questions first, then locked cards
+    return [...filteredQuestions, ...lockedCards];
+  }, [filteredQuestions, lockedCards, hasPremium]);
+
+  const totalPages = Math.ceil(allQuestionsWithLocked.length / itemsPerPage);
   const paginatedQuestions = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredQuestions.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredQuestions, currentPage, itemsPerPage]);
+    return allQuestionsWithLocked.slice(startIndex, startIndex + itemsPerPage);
+  }, [allQuestionsWithLocked, currentPage, itemsPerPage]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -256,11 +308,24 @@ export function QuestionLibrary({
   };
 
   const getRandomFreeQuestion = () => {
-    const freeQuestions = questions.filter((q) => !q.is_premium);
-    if (freeQuestions.length > 0) {
+    // Filter for free questions that haven't been answered yet
+    const unansweredFreeQuestions = questions.filter((q) => {
+      if (q.is_premium) return false;
+      // Check if question has been answered (userSelectedAnswer is set, attempted is true, or showAnswer is true)
+      const isAnswered = 
+        (q.userSelectedAnswer !== null && q.userSelectedAnswer !== undefined) ||
+        q.attempted === true ||
+        q.showAnswer === true;
+      return !isAnswered;
+    });
+
+    if (unansweredFreeQuestions.length > 0) {
       const randomQ =
-        freeQuestions[Math.floor(Math.random() * freeQuestions.length)];
+        unansweredFreeQuestions[Math.floor(Math.random() * unansweredFreeQuestions.length)];
       navigate(`/questions/${randomQ.id}`);
+    } else {
+      // All free questions have been answered
+      toast.info("All free questions have been answered! Unlock premium for more questions.");
     }
   };
 
@@ -369,7 +434,13 @@ export function QuestionLibrary({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <PageMeta
+        title="Question Library"
+        description="Browse and practice 200+ coding interview questions. Filter by difficulty level, programming language, and track your progress."
+        keywords="coding questions, interview questions, programming practice, JavaScript, Python, React, Node.js"
+      />
+      <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <OnboardingModal
           isOpen={showPreferencesModal}
@@ -384,11 +455,14 @@ export function QuestionLibrary({
                 Question Library
               </h1>
               <p className="text-sm sm:text-base text-gray-600">
-                {filteredQuestions.length} questions available
+                {hasPremiumStatus
+                  ? filteredQuestions.length
+                  : questionsData?.count || 0}{" "}
+                questions available
               </p>
             </div>
             <div className="flex flex-col items-stretch sm:items-end gap-2">
-              {!hasUnlocked && (
+              {!hasPremiumStatus && (
                 <div className="text-left sm:text-right">
                   <Button
                     onClick={onUnlock}
@@ -598,7 +672,7 @@ export function QuestionLibrary({
 
           {/* Questions Grid */}
           <div className="flex-1 min-w-0">
-            {filteredQuestions.length === 0 ? (
+            {allQuestionsWithLocked.length === 0 ? (
               <Card className="p-8 sm:p-12 text-center">
                 <p className="text-gray-600 mb-2">No questions found</p>
                 <p className="text-sm text-gray-500">
@@ -609,9 +683,55 @@ export function QuestionLibrary({
               <>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                   {paginatedQuestions.map((question) => {
-                    const answered = question.attempted;
-                    const answeredCorrect = question.isCorrect === true;
-                    const answeredIncorrect = question.isCorrect === false;
+                    // Check if this is a locked card
+                    const isLockedCard =
+                      "isLocked" in question && question.isLocked === true;
+
+                    if (isLockedCard) {
+                      const lockedCard = question as LockedCard;
+                      return (
+                        <Card
+                          key={lockedCard.id}
+                          className="relative border bg-white cursor-pointer hover:shadow-lg transition-shadow border-2 opacity-75"
+                          onClick={() => onUnlock()}
+                        >
+                          <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+                            <div className="text-center">
+                              <Lock className="w-8 h-8 text-blue-600 mx-auto mb-1" />
+                              <p className="text-xs text-gray-700">€2/month</p>
+                            </div>
+                          </div>
+                          <CardHeader>
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <Badge
+                                className={getLevelColor(lockedCard.level)}
+                                variant="outline"
+                              >
+                                {lockedCard.level}
+                              </Badge>
+                            </div>
+                            <CardTitle className="text-base leading-tight blur-sm">
+                              Premium Question
+                            </CardTitle>
+                            <CardDescription className="blur-sm">
+                              {lockedCard.language} • 15 min
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex flex-wrap items-center gap-2 text-sm blur-sm">
+                              <Badge variant="outline" className="text-xs">
+                                Medium
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    }
+
+                    const realQuestion = question as Question;
+                    const answered = realQuestion.attempted;
+                    const answeredCorrect = realQuestion.isCorrect === true;
+                    const answeredIncorrect = realQuestion.isCorrect === false;
 
                     const bgClass = answered
                       ? answeredCorrect
@@ -623,18 +743,18 @@ export function QuestionLibrary({
 
                     return (
                       <Card
-                        key={question.id}
+                        key={realQuestion.id}
                         className={`relative border ${bgClass} ${
-                          !question.is_premium || hasUnlocked
+                          !realQuestion.is_premium || hasUnlocked
                             ? "cursor-pointer hover:shadow-lg"
                             : "opacity-75"
                         } transition-shadow border-2`}
                         onClick={() =>
-                          (!question.is_premium || hasUnlocked) &&
-                          navigate(`/questions/${question.id}`)
+                          (!realQuestion.is_premium || hasUnlocked) &&
+                          navigate(`/questions/${realQuestion.id}`)
                         }
                       >
-                        {question.is_premium && !hasUnlocked && (
+                        {realQuestion.is_premium && !hasUnlocked && (
                           <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                             <div className="text-center">
                               <Lock className="w-8 h-8 text-blue-600 mx-auto mb-1" />
@@ -645,12 +765,12 @@ export function QuestionLibrary({
                         <CardHeader>
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <Badge
-                              className={getLevelColor(question.level)}
+                              className={getLevelColor(realQuestion.level)}
                               variant="outline"
                             >
-                              {question.level}
+                              {realQuestion.level}
                             </Badge>
-                            {!question.is_premium ? (
+                            {!realQuestion.is_premium ? (
                               <Badge
                                 variant="secondary"
                                 className="bg-green-100 text-green-700"
@@ -662,31 +782,32 @@ export function QuestionLibrary({
                             ) : null}
                           </div>
                           <CardTitle className="text-base leading-tight">
-                            {question.title}
+                            {realQuestion.title}
                           </CardTitle>
                           <CardDescription>
-                            {question.language} • {question.duration} min
+                            {realQuestion.language} • {realQuestion.duration}{" "}
+                            min
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
                           <div className="flex flex-wrap items-center gap-2 text-sm">
                             <Badge variant="outline" className="text-xs">
-                              {question.difficulty}
+                              {realQuestion.difficulty}
                             </Badge>
-                            {question.attempted && (
+                            {realQuestion.attempted && (
                               <Badge
                                 variant="outline"
                                 className={
-                                  question.isCorrect === true
+                                  realQuestion.isCorrect === true
                                     ? "border-green-500 text-green-700"
-                                    : question.isCorrect === false
+                                    : realQuestion.isCorrect === false
                                     ? "border-red-500 text-red-600"
                                     : ""
                                 }
                               >
-                                {question.isCorrect === true
+                                {realQuestion.isCorrect === true
                                   ? "✓ Correct"
-                                  : question.isCorrect === false
+                                  : realQuestion.isCorrect === false
                                   ? "✗ Incorrect"
                                   : "Attempted"}
                               </Badge>
@@ -772,5 +893,6 @@ export function QuestionLibrary({
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -8,7 +8,7 @@ export async function createSubscriptionCheckout() {
   const headers = await getAuthHeaders();
   const res = await axiosInstance.post<CreateSubscriptionCheckoutResponse>(
     "/api/subscriptions/create",
-    null,
+    {},
     { headers }
   );
   return res.data;

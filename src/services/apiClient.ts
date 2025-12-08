@@ -1,7 +1,11 @@
-import axios, { AxiosRequestHeaders, AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosRequestHeaders,
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from "axios";
 
-// const BASE_URL = "https://asphyxial-unrefreshed-brodie.ngrok-free.dev";
-const BASE_URL = "http://localhost:5001";
+// Use environment variable for API URL, fallback to localhost for development
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -10,7 +14,9 @@ export const axiosInstance = axios.create({
   },
 });
 
-async function getIdToken(forceRefresh: boolean = false): Promise<string | null> {
+async function getIdToken(
+  forceRefresh: boolean = false
+): Promise<string | null> {
   const { auth } = await import("../lib/firebase");
   const user = auth.currentUser;
   if (!user) return null;
@@ -18,7 +24,9 @@ async function getIdToken(forceRefresh: boolean = false): Promise<string | null>
   return await user.getIdToken(forceRefresh);
 }
 
-export async function getAuthHeaders(forceRefresh: boolean = false): Promise<AxiosRequestHeaders> {
+export async function getAuthHeaders(
+  forceRefresh: boolean = false
+): Promise<AxiosRequestHeaders> {
   const token = await getIdToken(forceRefresh);
   const headers = {} as AxiosRequestHeaders;
   if (token) {
@@ -49,7 +57,9 @@ axiosInstance.interceptors.request.use(async (config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     // Check if error is due to expired/invalid token
     if (
@@ -57,11 +67,13 @@ axiosInstance.interceptors.response.use(
       originalRequest &&
       !originalRequest._retry &&
       error.response?.data &&
-      typeof error.response.data === 'object' &&
-      'error' in error.response.data &&
+      typeof error.response.data === "object" &&
+      "error" in error.response.data &&
       (error.response.data.error === "Invalid or expired token" ||
-       error.response.data.error === "Unauthorized" ||
-       error.response.data.message === "Invalid or expired token")
+        error.response.data.error === "Unauthorized" ||
+        (typeof error.response.data === "object" &&
+          "message" in error.response.data &&
+          error.response.data.message === "Invalid or expired token"))
     ) {
       originalRequest._retry = true;
 
@@ -69,15 +81,15 @@ axiosInstance.interceptors.response.use(
         // Force refresh the token
         const { auth } = await import("../lib/firebase");
         const user = auth.currentUser;
-        
+
         if (user) {
           // Get a fresh token
           const newToken = await user.getIdToken(true);
-          
+
           if (newToken && originalRequest.headers) {
             // Update the authorization header with the new token
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            
+
             // Retry the original request with the new token
             return axiosInstance(originalRequest);
           }

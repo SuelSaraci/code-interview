@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Routes,
   Route,
@@ -23,6 +23,8 @@ import { PaywallModal } from "./components/PaywallModal";
 import { AuthModal } from "./components/AuthModal";
 import { useUserProgress } from "./hooks/useUserProgress";
 import { useAuth } from "./hooks/useAuth";
+import { useSubscription } from "./hooks/useSubscription";
+import { useResetState } from "./hooks/useResetState";
 import { questions } from "./data/questions";
 import { codingChallenges } from "./data/challenges";
 import { Level, Language } from "./types";
@@ -44,6 +46,7 @@ export default function App() {
     loading: authLoading,
     logout: firebaseLogout,
   } = useAuth();
+  const resetAllState = useResetState();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -74,12 +77,74 @@ export default function App() {
     unlockAll,
     canAccessQuestion,
     shouldShowPaywall,
+    resetProgress,
   } = useUserProgress();
+
+  // Get subscription status from backend
+  const { hasPremium, isLoading: subscriptionLoading, refreshSubscription } = useSubscription();
+
+  // Track previous user to detect user changes (for cleanup)
+  const previousUserIdRef = useRef<string | null>(null);
+
+  // Clear state when user changes (logout or login with different user)
+  useEffect(() => {
+    const currentUserId = firebaseUser?.uid || null;
+    const previousUserId = previousUserIdRef.current;
+    
+    // If user changed (not just initial load), clear state
+    if (previousUserId !== null && previousUserId !== currentUserId) {
+      resetAllState();
+      resetProgress();
+      setUserPreferences({ levels: [], languages: [] });
+    }
+    
+    // Update previous user ID
+    previousUserIdRef.current = currentUserId;
+  }, [firebaseUser?.uid, resetAllState, resetProgress]);
 
   // Save user preferences to localStorage
   useEffect(() => {
     localStorage.setItem("userPreferences", JSON.stringify(userPreferences));
   }, [userPreferences]);
+
+  // Handle redirect from LemonSqueezy checkout
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkoutStatus = urlParams.get("checkout");
+    const checkoutId = urlParams.get("checkout_id");
+
+    if (checkoutStatus === "success" && checkoutId) {
+      // Remove query parameters from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Refresh subscription status (webhook should have processed by now)
+      // Poll for a few seconds to catch the webhook
+      const maxAttempts = 10;
+      let attempts = 0;
+      const pollInterval = setInterval(async () => {
+        attempts++;
+        await refreshSubscription();
+        
+        if (hasPremium || attempts >= maxAttempts) {
+          clearInterval(pollInterval);
+          if (hasPremium) {
+            toast.success("🎉 Premium subscription activated! Welcome to unlimited access!");
+          } else if (attempts >= maxAttempts) {
+            toast.info("Subscription is processing. It may take a moment to activate.");
+          }
+        }
+      }, 1000);
+
+      return () => clearInterval(pollInterval);
+    }
+  }, [refreshSubscription, hasPremium]);
+
+  // Sync backend subscription status with local state
+  useEffect(() => {
+    if (hasPremium && !progress.hasUnlocked) {
+      unlockAll();
+    }
+  }, [hasPremium, progress.hasUnlocked, unlockAll]);
 
   // Redirect logic: logged in users from "/" to "/dashboard", non-logged in users from "/dashboard" to "/"
   useEffect(() => {
@@ -131,8 +196,9 @@ export default function App() {
     const question = questions.find((q) => q.id === questionId);
     if (!question) return;
 
-    // Check if user can access this question
-    if (canAccessQuestion(question.isFree)) {
+    // Check if user can access this question (backend subscription takes precedence)
+    const canAccess = question.isFree || hasPremium || canAccessQuestion(question.isFree);
+    if (canAccess) {
       navigate(`/practice/${questionId}`);
     } else if (shouldShowPaywall(question.isFree)) {
       setShowPaywall(true);
@@ -178,13 +244,23 @@ export default function App() {
     setShowAuth(true);
   };
 
-  const handleAuthSuccess = (userData: { email: string; name: string }) => {
+  const handleAuthSuccess = async (userData: { email: string; name: string }) => {
+    // Clear previous user's data when a new user logs in
+    await resetAllState();
+    resetProgress();
+    
+    // Reset user preferences for new user
+    const newPreferences = { levels: [], languages: [] };
+    setUserPreferences(newPreferences);
+    
     // User is automatically set via useAuth hook when Firebase auth state changes
     toast.success(`Welcome ${userData.name}! 👋`);
 
-    // Check if user has completed onboarding (has preferences saved)
+    // Check if user has completed onboarding (check localStorage for this user)
     const hasCompletedOnboarding =
-      userPreferences.levels.length > 0 && userPreferences.languages.length > 0;
+      (typeof window !== "undefined" &&
+        localStorage.getItem("onboardingCompleted") === "true") ||
+      (newPreferences.levels.length > 0 && newPreferences.languages.length > 0);
 
     if (!hasCompletedOnboarding) {
       // Show onboarding modal after login
@@ -197,6 +273,12 @@ export default function App() {
   const handleLogout = async () => {
     const result = await firebaseLogout();
     if (result.success) {
+      // Clear all state (Recoil atoms and localStorage)
+      await resetAllState();
+      
+      // Reset user progress
+      resetProgress();
+      
       toast.info("Logged out successfully");
       navigate("/");
     } else {
@@ -219,7 +301,8 @@ export default function App() {
       <ScrollToTop />
       <Navigation
         currentPage={currentPage}
-        hasUnlocked={progress.hasUnlocked}
+        hasUnlocked={hasPremium || progress.hasUnlocked}
+        hasPremium={hasPremium}
         user={user}
         onLogin={handleLogin}
         onLogout={handleLogout}
@@ -238,7 +321,7 @@ export default function App() {
                 onStartFree={handleStartFree}
                 onSelectQuestion={handleSelectQuestion}
                 onUnlock={handleUnlock}
-                hasUnlocked={progress.hasUnlocked}
+                hasUnlocked={hasPremium || progress.hasUnlocked}
                 onLoginRequired={handleLoginRequired}
               />
             )
@@ -252,7 +335,8 @@ export default function App() {
             ) : user ? (
               <QuestionLibrary
                 onSelectQuestion={handleSelectQuestion}
-                hasUnlocked={progress.hasUnlocked}
+                hasUnlocked={hasPremium || progress.hasUnlocked}
+                hasPremium={hasPremium}
                 onUnlock={handleUnlock}
                 userPreferences={userPreferences}
               />
@@ -292,7 +376,11 @@ export default function App() {
             authLoading ? (
               <AuthLoadingState />
             ) : user ? (
-              <PracticesList />
+              <PracticesList 
+                onUnlock={handleUnlock} 
+                hasUnlocked={hasPremium || progress.hasUnlocked}
+                hasPremium={hasPremium}
+              />
             ) : (
               <ProtectedRoute
                 onLoginRequired={() => {
@@ -327,7 +415,7 @@ export default function App() {
           element={
             <CodingChallenges
               challenges={codingChallenges}
-              hasUnlocked={progress.hasUnlocked}
+              hasUnlocked={hasPremium || progress.hasUnlocked}
               onUnlock={handleUnlock}
             />
           }
@@ -356,7 +444,7 @@ export default function App() {
             user ? (
               <Dashboard
                 onSelectQuestion={handleSelectQuestion}
-                hasUnlocked={progress.hasUnlocked}
+                hasUnlocked={hasPremium || progress.hasUnlocked}
               />
             ) : (
               <Navigate to="/" replace />
@@ -370,7 +458,7 @@ export default function App() {
               <AuthLoadingState />
             ) : user ? (
               <PricingPage
-                hasUnlocked={progress.hasUnlocked}
+                hasUnlocked={hasPremium || progress.hasUnlocked}
                 onUnlock={handleUnlock}
               />
             ) : (
@@ -476,6 +564,7 @@ function PracticeModeWrapper() {
   const navigate = useNavigate();
   const { progress, completeQuestion, canAccessQuestion, shouldShowPaywall } =
     useUserProgress();
+  const { hasPremium } = useSubscription();
 
   const question = questions.find((q) => q.id === questionId);
 
@@ -484,8 +573,9 @@ function PracticeModeWrapper() {
     return null;
   }
 
-  // Check if user can access this question
-  if (!canAccessQuestion(question.isFree)) {
+  // Check if user can access this question (backend subscription takes precedence)
+  const canAccess = question.isFree || hasPremium || canAccessQuestion(question.isFree);
+  if (!canAccess) {
     if (shouldShowPaywall(question.isFree)) {
       // This will be handled by the parent App component's paywall state
       navigate("/questions");
@@ -516,7 +606,7 @@ function PracticeModeWrapper() {
       question={question}
       onBack={() => navigate("/questions")}
       onComplete={handleComplete}
-      hasUnlocked={progress.hasUnlocked}
+      hasUnlocked={hasPremium || progress.hasUnlocked}
       freeQuestionsUsed={progress.freeQuestionsUsed}
     />
   );

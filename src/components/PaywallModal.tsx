@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +9,8 @@ import {
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Lock, Check, Sparkles, CreditCard, User } from "lucide-react";
-import { useState } from "react";
+import { createSubscriptionCheckout } from "../services/subscriptionsService";
+import { toast } from "sonner";
 
 interface PaywallModalProps {
   isOpen: boolean;
@@ -28,7 +30,7 @@ export function PaywallModal({
   const [processing, setProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     // Check if user is logged in
     if (!user) {
       onClose();
@@ -37,22 +39,31 @@ export function PaywallModal({
     }
 
     setProcessing(true);
-    // Mock payment processing
-    setTimeout(() => {
-      setProcessing(false);
-      setShowSuccess(true);
+    try {
+      // Create LemonSqueezy checkout session
+      const response = await createSubscriptionCheckout();
 
-      // Show confetti effect
-      setTimeout(() => {
-        onUnlock();
-        setShowSuccess(false);
-        onClose();
-      }, 2000);
-    }, 1500);
+      if (response.success && response.checkout_url) {
+        // Redirect to LemonSqueezy checkout
+        window.location.href = response.checkout_url;
+        // Note: onUnlock will be called when user returns from checkout
+        // via the URL parameter handler in App.tsx
+      } else {
+        throw new Error("Failed to create checkout session");
+      }
+    } catch (error: any) {
+      console.error("Error creating checkout:", error);
+      toast.error(
+        error.response?.data?.error ||
+          "Failed to start checkout. Please try again."
+      );
+      setProcessing(false);
+    }
   };
 
   const features = [
     "200+ expert-crafted questions for all levels",
+    "All practice questions and exercises",
     "All experience levels (Junior, Mid, Senior)",
     "All languages: HTML, CSS, JS, Python, Java, React, Node.js, SQL, TypeScript, Ruby",
     "Tech hints for every question",
@@ -71,7 +82,7 @@ export function PaywallModal({
             </div>
             <h2 className="text-3xl mb-2">🎉 Unlocked!</h2>
             <p className="text-gray-600">
-              You now have access to all premium content
+              You now have access to all premium questions and practices
             </p>
           </div>
         </DialogContent>
@@ -90,7 +101,8 @@ export function PaywallModal({
             </DialogTitle>
           </div>
           <DialogDescription>
-            Monthly subscription of €2 to unlock all questions for all levels
+            Monthly subscription of €2 to unlock all questions and practices for
+            all levels
           </DialogDescription>
         </DialogHeader>
 
@@ -127,7 +139,7 @@ export function PaywallModal({
                   </Badge>
                 </div>
                 <p className="text-sm text-gray-600">
-                  All questions • All levels
+                  All questions & practices • All levels
                 </p>
                 {user && (
                   <p className="text-xs text-blue-600 mt-1">

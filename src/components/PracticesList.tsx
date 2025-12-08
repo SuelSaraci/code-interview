@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useRecoilValueLoadable, useSetRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
 import { Search, Lock, Loader2, AlertTriangle } from "lucide-react";
@@ -14,7 +14,7 @@ import {
 import { Badge } from "./ui/badge";
 import { practicesQuerySelector } from "../state/selectors/practicesSelectors";
 import { useAuth } from "../hooks/useAuth";
-import type { QuestionLevel } from "../services/types";
+import type { QuestionLevel, Practice } from "../services/types";
 import { resetPracticeAttempts } from "../services/practicesService";
 import { toast } from "sonner";
 import { practicesRefreshKeyState } from "../state/atoms/practicesAtoms";
@@ -29,8 +29,32 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "./ui/pagination";
 
-export function PracticesList() {
+interface PracticesListProps {
+  onUnlock: () => void;
+  hasUnlocked: boolean;
+  hasPremium?: boolean;
+}
+
+interface LockedPracticeCard {
+  id: string;
+  isLocked: true;
+  level: QuestionLevel;
+  language: string;
+}
+
+type PracticeOrLocked = Practice | LockedPracticeCard;
+
+export function PracticesList({ onUnlock, hasUnlocked, hasPremium: hasPremiumProp }: PracticesListProps) {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -39,6 +63,8 @@ export function PracticesList() {
   );
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
   const [resetLoading, setResetLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
   const setPracticesRefreshKey = useSetRecoilState(practicesRefreshKeyState);
   // Subscribe to refresh key changes to ensure component re-renders when it updates
   const practicesRefreshKey = useRecoilValue(practicesRefreshKeyState);
@@ -51,6 +77,8 @@ export function PracticesList() {
   const practicesData =
     practicesLoadable.state === "hasValue" ? practicesLoadable.contents : null;
   const practices = practicesData?.practices || [];
+  // Use prop if provided, otherwise fall back to data from API
+  const hasPremium = hasPremiumProp ?? practicesData?.hasPremium ?? false;
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -86,6 +114,43 @@ export function PracticesList() {
       return matchesSearch && matchesLevel && matchesLanguage;
     });
   }, [practices, searchQuery, selectedLevel, selectedLanguage]);
+
+  // Create dummy locked cards when hasPremium is false
+  const lockedCards = useMemo((): LockedPracticeCard[] => {
+    if (hasPremium) return [];
+    
+    // Create enough locked cards to fill the grid (at least 9-12 cards)
+    // We'll create cards with different levels and languages for variety
+    const levels: QuestionLevel[] = ["junior", "mid", "senior"];
+    const languages = ["JavaScript", "Python", "React", "Node.js", "TypeScript", "Java", "SQL", "Ruby", "HTML", "CSS"];
+    
+    return Array.from({ length: 30 }, (_, i) => ({
+      id: `locked-practice-${i}`,
+      isLocked: true as const,
+      level: levels[i % levels.length] as QuestionLevel,
+      language: languages[i % languages.length],
+    }));
+  }, [hasPremium]);
+
+  // Combine filtered practices with locked cards when hasPremium is false
+  const allPracticesWithLocked = useMemo((): PracticeOrLocked[] => {
+    if (hasPremium) {
+      return filteredPractices;
+    }
+    // When hasPremium is false, show free practices first, then locked cards
+    return [...filteredPractices, ...lockedCards];
+  }, [filteredPractices, lockedCards, hasPremium]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedLevel, selectedLanguage]);
+
+  const totalPages = Math.ceil(allPracticesWithLocked.length / itemsPerPage);
+  const paginatedPractices = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return allPracticesWithLocked.slice(startIndex, startIndex + itemsPerPage);
+  }, [allPracticesWithLocked, currentPage, itemsPerPage]);
 
   const handlePracticeClick = (practiceId: number) => {
     navigate(`/practices/${practiceId}`);
@@ -169,16 +234,41 @@ export function PracticesList() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl sm:text-4xl mb-1 sm:mb-2">
-              Practice Questions
-            </h1>
-            <p className="text-sm sm:text-base text-gray-600">
-              Test your knowledge with multiple choice questions
-            </p>
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl mb-1 sm:mb-2">
+                Practice Questions
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600">
+                {hasPremium
+                  ? filteredPractices.length
+                  : practicesData?.count || 0}{" "}
+                practices available
+              </p>
+            </div>
+            <div className="flex flex-col items-stretch sm:items-end gap-2">
+              {!hasPremium && (
+                <div className="text-left sm:text-right">
+                  <Button
+                    onClick={onUnlock}
+                    className="gap-2 mb-1 w-full sm:w-auto"
+                  >
+                    <Lock className="w-4 h-4" />
+                    <span className="hidden sm:inline">
+                      Unlock All Premium Practices
+                    </span>
+                    <span className="sm:hidden">Unlock Premium</span>
+                  </Button>
+                  <p className="text-xs sm:text-sm text-gray-600">
+                    €2/month • All levels
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-          <AlertDialog>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
                 variant="outline"
@@ -228,6 +318,7 @@ export function PracticesList() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -301,12 +392,59 @@ export function PracticesList() {
         </div>
 
         {/* Practices Grid */}
-        {filteredPractices.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {filteredPractices.map((practice) => {
-              const answered = practice.attempted;
-              const answeredCorrect = practice.isCorrect === true;
-              const answeredIncorrect = practice.isCorrect === false;
+        {allPracticesWithLocked.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {paginatedPractices.map((practice) => {
+              // Check if this is a locked card
+              const isLockedCard = 'isLocked' in practice && practice.isLocked === true;
+              
+              if (isLockedCard) {
+                const lockedCard = practice as LockedPracticeCard;
+                return (
+                  <Card
+                    key={lockedCard.id}
+                    className="relative border bg-white cursor-pointer hover:shadow-lg transition-shadow border-2 opacity-75"
+                    onClick={() => onUnlock()}
+                  >
+                    <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+                      <div className="text-center">
+                        <Lock className="w-8 h-8 text-blue-600 mx-auto mb-1" />
+                        <p className="text-xs text-gray-700">€2/month</p>
+                      </div>
+                    </div>
+                    <CardHeader>
+                      <div className="flex items-start justify-between mb-2">
+                        <CardTitle className="text-lg line-clamp-2 blur-sm">
+                          Premium Practice
+                        </CardTitle>
+                      </div>
+                      <CardDescription className="line-clamp-2 blur-sm">
+                        Practice your skills with this premium question
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-wrap items-center gap-2 text-sm">
+                        <Badge
+                          className={getLevelColor(lockedCard.level)}
+                          variant="outline"
+                        >
+                          {lockedCard.level}
+                        </Badge>
+                        <Badge variant="secondary" className="blur-sm">{lockedCard.language}</Badge>
+                        <Badge variant="outline" className="text-xs blur-sm">
+                          Medium
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              const realPractice = practice as Practice;
+              const answered = realPractice.attempted;
+              const answeredCorrect = realPractice.isCorrect === true;
+              const answeredIncorrect = realPractice.isCorrect === false;
 
               const bgClass = answered
                 ? answeredCorrect
@@ -318,49 +456,49 @@ export function PracticesList() {
 
               return (
                 <Card
-                  key={practice.id}
+                  key={realPractice.id}
                   className={`cursor-pointer hover:shadow-lg transition-shadow border-2 ${bgClass}`}
-                  onClick={() => handlePracticeClick(practice.id)}
+                  onClick={() => handlePracticeClick(realPractice.id)}
                 >
                   <CardHeader>
                     <div className="flex items-start justify-between mb-2">
                       <CardTitle className="text-lg line-clamp-2">
-                        {practice.title}
+                        {realPractice.title}
                       </CardTitle>
-                      {practice.is_premium && (
+                      {realPractice.is_premium && !hasUnlocked && (
                         <Lock className="w-5 h-5 text-yellow-600 flex-shrink-0 ml-2" />
                       )}
                     </div>
                     <CardDescription className="line-clamp-2">
-                      {practice.description}
+                      {realPractice.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap items-center gap-2 text-sm">
                       <Badge
-                        className={getLevelColor(practice.level)}
+                        className={getLevelColor(realPractice.level)}
                         variant="outline"
                       >
-                        {practice.level}
+                        {realPractice.level}
                       </Badge>
-                      <Badge variant="secondary">{practice.language}</Badge>
+                      <Badge variant="secondary">{realPractice.language}</Badge>
                       <Badge variant="outline" className="text-xs">
-                        {practice.difficulty}
+                        {realPractice.difficulty}
                       </Badge>
-                      {practice.attempted && (
+                      {realPractice.attempted && (
                         <Badge
                           variant="outline"
                           className={
-                            practice.isCorrect === true
+                            realPractice.isCorrect === true
                               ? "border-green-500 text-green-700"
-                              : practice.isCorrect === false
+                              : realPractice.isCorrect === false
                               ? "border-red-500 text-red-600"
                               : ""
                           }
                         >
-                          {practice.isCorrect === true
+                          {realPractice.isCorrect === true
                             ? "✓ Correct"
-                            : practice.isCorrect === false
+                            : realPractice.isCorrect === false
                             ? "✗ Incorrect"
                             : "Attempted"}
                         </Badge>
@@ -369,8 +507,78 @@ export function PracticesList() {
                   </CardContent>
                 </Card>
               );
-            })}
-          </div>
+              })}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() =>
+                          setCurrentPage((p) => Math.max(1, p - 1))
+                        }
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : "cursor-pointer"
+                        }
+                      />
+                    </PaginationItem>
+
+                    {Array.from(
+                      { length: totalPages },
+                      (_, i) => i + 1
+                    ).map((page) => {
+                      // Show first page, last page, current page, and pages around current
+                      if (
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(page)}
+                              isActive={currentPage === page}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      } else if (
+                        page === currentPage - 2 ||
+                        page === currentPage + 2
+                      ) {
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        );
+                      }
+                      return null;
+                    })}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() =>
+                          setCurrentPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : "cursor-pointer"
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
         ) : (
           <Card>
             <CardContent className="pt-6">

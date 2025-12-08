@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Lock, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
+import { PageMeta } from "./PageMeta";
 import {
   Card,
   CardContent,
@@ -84,7 +85,13 @@ export function HomePage({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <>
+      <PageMeta
+        title="Home"
+        description="Start your coding interview preparation journey. Practice with 3 free questions, then unlock unlimited access to 200+ questions across all levels."
+        keywords="coding interview, interview prep, programming practice, free coding questions"
+      />
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-20">
         <div className="text-center mb-8 sm:mb-12">
@@ -349,5 +356,6 @@ export function HomePage({
         </div>
       </div>
     </div>
+    </>
   );
 }

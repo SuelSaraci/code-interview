@@ -1,6 +1,7 @@
 import React from "react";
 import { useRecoilValueLoadable } from "recoil";
 import { useNavigate } from "react-router-dom";
+import { PageMeta } from "./PageMeta";
 import {
   Card,
   CardContent,
@@ -112,7 +113,13 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <PageMeta
+        title="Dashboard"
+        description="Track your coding interview progress, view statistics, and see recommended questions to practice next."
+        keywords="dashboard, progress tracking, interview statistics, coding practice"
+      />
+      <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
@@ -383,5 +390,6 @@ export function Dashboard({ onSelectQuestion, hasUnlocked }: DashboardProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }

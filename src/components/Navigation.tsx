@@ -7,13 +7,14 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui
 interface NavigationProps {
   currentPage: string;
   hasUnlocked: boolean;
+  hasPremium?: boolean;
   user: { email: string; name: string } | null;
   onLogin: () => void;
   onLogout: () => void;
   onProtectedRouteClick?: () => void;
 }
 
-export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout, onProtectedRouteClick }: NavigationProps) {
+export function Navigation({ currentPage, hasUnlocked, hasPremium, user, onLogin, onLogout, onProtectedRouteClick }: NavigationProps) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -97,7 +98,7 @@ export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout, 
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {hasUnlocked && (
+            {hasPremium && user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm">
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                 Premium
@@ -165,7 +166,7 @@ export function Navigation({ currentPage, hasUnlocked, user, onLogin, onLogout, 
                           <p className="text-xs text-gray-600">{user.email}</p>
                         </div>
                       </div>
-                      {hasUnlocked && (
+                      {hasPremium && user && (
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm w-fit">
                           <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                           Premium Active
